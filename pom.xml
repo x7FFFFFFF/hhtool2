@@ -10,6 +10,7 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <currentHibernateVersion>5.4.1.Final</currentHibernateVersion>
     </properties>
 
     <dependencies>
@@ -43,7 +44,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>5.4.1.Final</version>
+            <version>${currentHibernateVersion}</version>
         </dependency>
         <dependency>
             <groupId>postgresql</groupId>
@@ -74,21 +75,21 @@
     <build>
         <plugins>
             <plugin>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>maven-jetty-plugin</artifactId>
-            <version>6.1.10</version>
-            <configuration>
-                <scanIntervalSeconds>10</scanIntervalSeconds>
-                <connectors>
-                    <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-                        <port>8080</port>
-                        <maxIdleTime>60000</maxIdleTime>
-                    </connector>
-                </connectors>
-                <stopKey/>
-                <stopPort/>
-            </configuration>
-        </plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <version>6.1.10</version>
+                <configuration>
+                    <scanIntervalSeconds>10</scanIntervalSeconds>
+                    <connectors>
+                        <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+                            <port>8080</port>
+                            <maxIdleTime>60000</maxIdleTime>
+                        </connector>
+                    </connectors>
+                    <stopKey/>
+                    <stopPort/>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -97,6 +98,25 @@
                     <target>8</target>
                 </configuration>
             </plugin>
+<!--            <plugin>
+                <groupId>org.hibernate.orm.tooling</groupId>
+                <artifactId>hibernate-enhance-maven-plugin</artifactId>
+                <version>${currentHibernateVersion}</version>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <base></base>
+                            <failOnError>true</failOnError>
+                            <enableLazyInitialization>true</enableLazyInitialization>
+                            <enableDirtyTracking>true</enableDirtyTracking>
+                            <enableAssociationManagement>true</enableAssociationManagement>
+                        </configuration>
+                        <goals>
+                            <goal>enhance</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>-->
         </plugins>
     </build>
 

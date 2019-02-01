@@ -1,24 +1,32 @@
 package ru.alex.vic.dao.hh;
 
+import com.google.inject.Provider;
+import com.google.inject.persist.Transactional;
 import ru.alex.vic.dao.Dao;
 import ru.alex.vic.entities.hh.HHLocation;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
+
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 
+
 @Singleton
 public class HHLocationDao implements Dao<Long, HHLocation> {
-    @Inject
-    private Provider<EntityManager> em;
 
+    private final Provider<EntityManager> em;
+
+    @Inject
+    public HHLocationDao(Provider<EntityManager> em) {
+        this.em = em;
+    }
 
     @Override
+    @Transactional
     public HHLocation save(HHLocation enity) {
         final EntityManager entityManager = em.get();
         entityManager.persist(enity);
-        entityManager.flush();
+        //entityManager.flush();
         return enity;
     }
 

@@ -28,7 +28,7 @@ public class HHService {
     @Produces( TEXT_HTML )
     public String loadLocations() {
         HHLocation hhLocation = new HHLocation();
-        hhLocation.setId(1L);
+      /*  hhLocation.setId(1L);*/
         hhLocation.setHasChilds(true);
         hhLocation.setLocationType(LocationType.COUNTRY);
         hhLocation.setName("name");
