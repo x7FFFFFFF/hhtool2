@@ -3,6 +3,7 @@ package ru.alex.vic;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 import com.google.inject.persist.PersistFilter;
 import com.google.inject.persist.jpa.JpaPersistModule;
 import com.google.inject.servlet.GuiceServletContextListener;
@@ -14,14 +15,23 @@ import ru.alex.vic.dao.Dao;
 import ru.alex.vic.dao.hh.HHLocationDao;
 import ru.alex.vic.entities.hh.HHLocation;
 
+import java.util.Properties;
+
 public class MyGuiceServletConfig extends GuiceServletContextListener {
+
+    public static final String APP_PERSISTENCE_UNIT = "app.persistence.unit";
+    public static final String APPLICATION_PROPERTIES = "application.properties";
+    public static final String REST_PACKAGE = "ru.alex.vic.rest";
+
     protected Injector getInjector() {
-        final ResourceConfig rc = new PackagesResourceConfig("ru.alex.vic.rest");
+        final ResourceConfig rc = new PackagesResourceConfig(REST_PACKAGE);
         return Guice.createInjector(new ServletModule() {
 
             @Override
             protected void configureServlets() {
-                install(new JpaPersistModule("my-persistence-unit"));
+                final Properties properties = Utils.createProperties(APPLICATION_PROPERTIES);
+                Names.bindProperties(binder(), properties);
+                install(new JpaPersistModule(properties.getProperty(APP_PERSISTENCE_UNIT)));
                 filter("/*").through(PersistFilter.class);
 
                 bind(new TypeLiteral<Dao<Long, HHLocation>>() {
