@@ -1,6 +1,9 @@
 package ru.alex.vic.client;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -13,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Singleton
 public class HttpClient {
@@ -42,5 +47,22 @@ public class HttpClient {
         }
     }
 
+    public <T> T get(String url, Function<JsonObject, T> function) {
+        HttpGet httpGet = new HttpGet(url);
+        httpGet.setHeader(CONTENT_TYPE_HEADER, APPLICATION_JSON);
+        try (CloseableHttpClient httpclient = HttpClientBuilder.create().setConnectionTimeToLive(connTimeToLive, TimeUnit.MINUTES).build();
+             CloseableHttpResponse response = httpclient.execute(httpGet);
+             Reader reader = new InputStreamReader(response.getEntity().getContent(), UTF_8);
+             JsonReader jsonReader = new JsonReader(reader)
+        ) {
+            JsonObject json = (JsonObject) new JsonParser().parse(jsonReader);
+            return function.apply(json);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    public Gson getGson() {
+        return gson;
+    }
 }

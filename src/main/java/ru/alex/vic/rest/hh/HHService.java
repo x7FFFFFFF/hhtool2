@@ -8,6 +8,7 @@ import ru.alex.vic.entities.hh.HHLocation;
 import ru.alex.vic.json.hh.HHLocationJson;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -16,7 +17,8 @@ import java.util.function.Consumer;
 
 import static javax.ws.rs.core.MediaType.TEXT_HTML;
 
-@Path( "hh" )
+@Singleton
+@Path("hh")
 public class HHService {
 
 
@@ -32,23 +34,22 @@ public class HHService {
 
     @GET
     @Path("loadLocations")
-    @Produces( TEXT_HTML )
+    @Produces(TEXT_HTML)
     @Transactional
     public String loadLocations() {
         this.dao.deleteAll();
         final HHLocationJson[] locations = hhClient.getLocations();
         iterate(locations, this.dao::save);
-        String html = "<h2>Done</h2> Count:"+ locations.length;
+        String html = "<h2>Done</h2> Count:" + locations.length;
 
         return html;
     }
 
 
-
     private static void iterate(HHLocationJson[] hhLocationJsons, Consumer<HHLocation> consumer) {
         for (HHLocationJson hhLocationJson : hhLocationJsons) {
             consumer.accept(new HHLocation(hhLocationJson));
-            iterate( hhLocationJson.getAreas(), consumer);
+            iterate(hhLocationJson.getAreas(), consumer);
         }
     }
 }
