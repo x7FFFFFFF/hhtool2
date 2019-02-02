@@ -3,10 +3,7 @@ package ru.alex.vic.entities;
 
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
@@ -33,7 +30,8 @@ public class Location {
     @Column(nullable = false, unique = true)
     private Long vendorId;
 
-    @Column
+    @Column(length = 10)
+    @Enumerated(EnumType.STRING)
     private LocationType locationType;
 
     public Location() {

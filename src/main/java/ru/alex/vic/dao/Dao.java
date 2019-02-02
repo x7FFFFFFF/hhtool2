@@ -7,4 +7,7 @@ public interface Dao<I, T> {
     T getById(I id);
 
 
+    void deleteAll();
+
+
 }

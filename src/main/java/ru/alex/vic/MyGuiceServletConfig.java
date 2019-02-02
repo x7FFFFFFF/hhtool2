@@ -11,6 +11,8 @@ import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
+import ru.alex.vic.client.HttpClient;
+import ru.alex.vic.client.hh.HHClient;
 import ru.alex.vic.dao.Dao;
 import ru.alex.vic.dao.hh.HHLocationDao;
 import ru.alex.vic.entities.hh.HHLocation;
@@ -41,7 +43,8 @@ public class MyGuiceServletConfig extends GuiceServletContextListener {
                     System.out.println("Binding resource: " + resource.getName());
                     bind(resource);
                 }
-
+                bind(HttpClient.class);
+                bind(HHClient.class);
                 serve("/services/*").with(GuiceContainer.class);
             }
         });

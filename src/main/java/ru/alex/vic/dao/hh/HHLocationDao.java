@@ -9,6 +9,8 @@ import javax.inject.Inject;
 
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
 
 
 @Singleton
@@ -33,5 +35,14 @@ public class HHLocationDao implements Dao<Long, HHLocation> {
     @Override
     public HHLocation getById(Long id) {
         return em.get().find(HHLocation.class, id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAll() {
+        final CriteriaDelete<HHLocation> criteriaDelete = this.em.get()
+                .getCriteriaBuilder().createCriteriaDelete(HHLocation.class);
+        criteriaDelete.from(HHLocation.class);
+        em.get().createQuery(criteriaDelete).executeUpdate();
     }
 }
