@@ -36,7 +36,7 @@ public class VkClient {
     }
 
     public GetCitiesResponse getCitiesByCountryAndRegion(Integer countryId, Integer regionId) {
-        final String url = urlBuilder.get().getRegions()
+        final String url = urlBuilder.get().getCities()
                 .countryId(countryId)
                 .regionId( regionId)
                 .needAll()
