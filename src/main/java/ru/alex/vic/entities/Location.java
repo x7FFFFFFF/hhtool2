@@ -35,6 +35,10 @@ public class Location {
     @Enumerated(EnumType.STRING)
     private LocationType locationType;
 
+
+    @Column(name = "resolved")
+    private boolean resolved;
+
     public Location() {
     }
 
@@ -94,14 +98,25 @@ public class Location {
         this.hasChilds = hasChilds;
     }
 
+    public boolean isResolved() {
+        return resolved;
+    }
+
+    public void setResolved(boolean resolved) {
+        this.resolved = resolved;
+    }
+
     @Override
     public String toString() {
         return "Location{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", modified=" + modified +
+                ", name='" + name + '\'' +
                 ", hasChilds=" + hasChilds +
                 ", parentVendorId=" + parentVendorId +
                 ", vendorId=" + vendorId +
                 ", locationType=" + locationType +
+                ", resolved=" + resolved +
                 '}';
     }
 
