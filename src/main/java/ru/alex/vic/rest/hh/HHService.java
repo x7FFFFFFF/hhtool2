@@ -31,7 +31,10 @@ public class HHService {
         this.hhClient = hhClient;
     }
 
-
+    /**  Другие страны  1001 ? TODO: поправить locationType, дочергими элементами "Другие страны" являются страны, но сейчас им ставится locationType = REGION
+     *
+     *
+     */
     @GET
     @Path("loadLocations")
     @Produces(TEXT_HTML)

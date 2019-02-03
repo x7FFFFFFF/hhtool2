@@ -15,6 +15,7 @@ import ru.alex.vic.client.HttpClient;
 import ru.alex.vic.client.hh.HHClient;
 import ru.alex.vic.dao.Dao;
 import ru.alex.vic.dao.hh.HHLocationDao;
+import ru.alex.vic.dao.vk.VkLocationDao;
 import ru.alex.vic.entities.hh.HHLocation;
 
 import java.util.Properties;
@@ -45,6 +46,7 @@ public class MyGuiceServletConfig extends GuiceServletContextListener {
                 }
                 bind(HttpClient.class);
                 bind(HHClient.class);
+                bind(VkLocationDao.class);
                 serve("/services/*").with(GuiceContainer.class);
             }
         });

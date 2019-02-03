@@ -32,6 +32,16 @@ public class VkUrlBuilder {
         return this;
     }
 
+    public VkUrlBuilder getRegions() {
+        this.method = "database.getRegions";
+        return this;
+    }
+    public VkUrlBuilder getCities() {
+        this.method = "database.getCities";
+        return this;
+    }
+
+
     public VkUrlBuilder method(String method) {
         this.method = method;
         return this;
@@ -39,6 +49,11 @@ public class VkUrlBuilder {
 
     VkUrlBuilder param(String key, String value) {
         params.put(key, value);
+        return this;
+    }
+
+    VkUrlBuilder param(String key, Integer value) {
+        params.put(key, value.toString());
         return this;
     }
 
@@ -50,8 +65,16 @@ public class VkUrlBuilder {
         return param("count", String.valueOf(count));
     }
 
+    public VkUrlBuilder needAll() {
+        return param("need_all", "1");
+    }
+
     public VkUrlBuilder code(String... codes) {
         return param("code", Stream.of(codes).collect(Collectors.joining(",")));
+    }
+
+    public VkUrlBuilder countryId(Integer code) {
+        return param("country_id", code);
     }
 
     private String buildParams() {
@@ -67,5 +90,9 @@ public class VkUrlBuilder {
 
     public String build() {
         return apiBaseUrl + method + "?" + buildParams() + "access_token=" + accessToken + "&v=" + apiVersion;
+    }
+
+    public VkUrlBuilder regionId(Integer regionId) {
+        return param("region_id", regionId);
     }
 }

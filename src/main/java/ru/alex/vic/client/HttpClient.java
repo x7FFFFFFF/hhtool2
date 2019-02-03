@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -47,7 +48,7 @@ public class HttpClient {
         }
     }
 
-    public <T> T get(String url, Function<JsonObject, T> function) {
+    public <T> T get(String url, BiFunction<Gson, JsonObject, T> function) {
         HttpGet httpGet = new HttpGet(url);
         httpGet.setHeader(CONTENT_TYPE_HEADER, APPLICATION_JSON);
         try (CloseableHttpClient httpclient = HttpClientBuilder.create().setConnectionTimeToLive(connTimeToLive, TimeUnit.MINUTES).build();
@@ -56,7 +57,7 @@ public class HttpClient {
              JsonReader jsonReader = new JsonReader(reader)
         ) {
             JsonObject json = (JsonObject) new JsonParser().parse(jsonReader);
-            return function.apply(json);
+            return function.apply(getGson(),json);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -103,4 +103,12 @@ public class Location {
                 ", locationType=" + locationType +
                 '}';
     }
+
+    protected static String parenthesesRemove(String name) {
+        final int start = name.indexOf('(');
+        if (start != -1) {
+            return name.substring(0, start).trim();
+        }
+        return name;
+    }
 }

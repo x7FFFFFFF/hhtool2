@@ -23,26 +23,36 @@ public class HHLocationDao implements Dao<Long, HHLocation> {
         this.em = em;
     }
 
-    @Override
+  /*  @Override
     @Transactional
     public HHLocation save(HHLocation enity) {
         final EntityManager entityManager = em.get();
         entityManager.persist(enity);
         //entityManager.flush();
         return enity;
-    }
+    }*/
 
-    @Override
+   /* @Override
     public HHLocation getById(Long id) {
         return em.get().find(HHLocation.class, id);
-    }
+    }*/
 
-    @Override
+  /*  @Override
     @Transactional
     public void deleteAll() {
         final CriteriaDelete<HHLocation> criteriaDelete = this.em.get()
                 .getCriteriaBuilder().createCriteriaDelete(HHLocation.class);
         criteriaDelete.from(HHLocation.class);
         em.get().createQuery(criteriaDelete).executeUpdate();
+    }*/
+
+    @Override
+    public Class<?> getEntityClass() {
+        return HHLocation.class;
+    }
+
+    @Override
+    public EntityManager getEntityManager() {
+        return em.get();
     }
 }
