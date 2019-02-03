@@ -15,9 +15,7 @@ public class Service {
                 final TaskStatus res = new TaskStatus(name);
                 return res;
             } else {
-                if (oldValue.getStatus() == TaskStatus.Status.RUN || oldValue.getStatus() == TaskStatus.Status.INIT) {
-                    throw new IllegalStateException();
-                }
+
                 return oldValue;
             }
         });

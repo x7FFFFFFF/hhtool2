@@ -59,7 +59,7 @@ public class VkService {
         if (task.isRunning()) {
             return task.toString();
         }
-
+        task.start();
 
 
         vkLocationDao.deleteAll();
@@ -89,7 +89,7 @@ public class VkService {
                 }
 
                 count++;
-                task.setComplete(count / regionsTotal * 100);
+                task.setComplete(count);
             }
         }
         task.stop();
