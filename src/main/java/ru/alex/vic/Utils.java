@@ -15,4 +15,12 @@ public class Utils {
             throw new RuntimeException(e);
         }
     }
+
+    public static void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

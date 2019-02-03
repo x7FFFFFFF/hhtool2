@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * GetRegionsResponse object
  */
-public class GetRegionsResponse {
+public class GetRegionsResponse implements VkResponse<Region> {
     /**
      * Total number
      */

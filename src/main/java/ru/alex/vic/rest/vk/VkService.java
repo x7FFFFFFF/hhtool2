@@ -1,6 +1,5 @@
 package ru.alex.vic.rest.vk;
 
-import com.google.inject.persist.Transactional;
 import ru.alex.vic.client.vk.VkClient;
 import ru.alex.vic.dao.vk.VkLocationDao;
 import ru.alex.vic.entities.vk.VkLocation;
@@ -14,8 +13,10 @@ import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import java.util.List;
 
 import static javax.ws.rs.core.MediaType.TEXT_HTML;
+import static ru.alex.vic.Utils.sleep;
 
 @Singleton
 @Path("vk")
@@ -52,7 +53,7 @@ public class VkService {
     @GET
     @Path("loadLocations")
     @Produces(TEXT_HTML)
-    @Transactional
+    /*@Transactional*/
     public String loadLocations() {
         //final String[] codes = {"RU", "UA", "KZ", "AZ", "BY", "GE", "KG", "UZ"};
         final TaskStatus task = service.startTask(LOAD_LOCATIONS);
@@ -71,23 +72,19 @@ public class VkService {
 
         for (Country country : countriesByCode.getItems()) {
             final GetRegionsResponse regionsByCountryCode = vkClient.getRegionsByCountryCode(country.getId());
+            //sleep(timeout);
             for (Region region : regionsByCountryCode.getItems()) {
                 vkLocationDao.save(new VkLocation(region, country));
             }
-            final Integer regionsTotal = regionsByCountryCode.getCount();
+            //final Integer regionsTotal = regionsByCountryCode.getCount();
             int count = 0;
             for (Region region : regionsByCountryCode.getItems()) {
                 System.out.println("region = " + region);
-                final GetCitiesResponse citiesByCountryAndRegion = vkClient.getCitiesByCountryAndRegion(country.getId(), region.getId());
+                final List<City> citiesByCountryAndRegion = vkClient.getCitiesByCountryAndRegion(country.getId(), region.getId());
                 sleep(timeout);
-                if (citiesByCountryAndRegion.getCount() == 1000) {
-                    System.out.println("Limit! region = " + region);
-                }
-                for (City city : citiesByCountryAndRegion.getItems()) {
-                    sleep(timeout);
+                for (City city : citiesByCountryAndRegion) {
                     vkLocationDao.save(new VkLocation(city, region));
                 }
-
                 count++;
                 task.setComplete(count);
             }
@@ -96,11 +93,5 @@ public class VkService {
         return task.toString();
     }
 
-    private void sleep(long ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 }

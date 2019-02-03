@@ -36,6 +36,7 @@ public class VkUrlBuilder {
         this.method = "database.getRegions";
         return this;
     }
+
     public VkUrlBuilder getCities() {
         this.method = "database.getCities";
         return this;
@@ -60,6 +61,17 @@ public class VkUrlBuilder {
     public VkUrlBuilder offset(int offset) {
         return param("offset", String.valueOf(offset));
     }
+
+    /*public VkUrlBuilder offsetPlus(Integer offset) {
+        params.compute("offset", (key, oldValue) -> {
+            if (oldValue == null) {
+                return offset.toString();
+            } else {
+                final int i = Integer.valueOf(oldValue) + offset;
+            }
+        });
+        return this;
+    }*/
 
     public VkUrlBuilder count(int count) {
         return param("count", String.valueOf(count));

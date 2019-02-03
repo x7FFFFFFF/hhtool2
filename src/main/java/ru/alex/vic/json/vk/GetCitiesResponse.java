@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * GetCitiesResponse object
  */
-public class GetCitiesResponse {
+public class GetCitiesResponse implements VkResponse<City> {
     /**
      * Total number
      */
@@ -19,10 +19,12 @@ public class GetCitiesResponse {
     @SerializedName("items")
     private List<City> items;
 
+    @Override
     public Integer getCount() {
         return count;
     }
 
+    @Override
     public List<City> getItems() {
         return items;
     }

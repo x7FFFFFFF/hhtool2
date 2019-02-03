@@ -2,26 +2,30 @@ package ru.alex.vic.client.vk;
 
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
+import ru.alex.vic.Utils;
 import ru.alex.vic.client.HttpClient;
-import ru.alex.vic.json.vk.GetCitiesResponse;
-import ru.alex.vic.json.vk.GetCountriesResponse;
-import ru.alex.vic.json.vk.GetRegionsResponse;
+import ru.alex.vic.json.vk.*;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class VkClient {
 
     private final HttpClient httpClient;
     private final Provider<VkUrlBuilder> urlBuilder;
+    private final int timeout;
 
 
     @Inject
-    public VkClient(HttpClient httpClient, Provider<VkUrlBuilder> urlBuilder) {
+    public VkClient(HttpClient httpClient, Provider<VkUrlBuilder> urlBuilder, @Named("vk.api.request_timeout.ms") int timeout) {
         this.httpClient = httpClient;
         this.urlBuilder = urlBuilder;
+        this.timeout = timeout;
     }
 
 
@@ -35,13 +39,28 @@ public class VkClient {
         return executeGet(url, GetRegionsResponse.class);
     }
 
-    public GetCitiesResponse getCitiesByCountryAndRegion(Integer countryId, Integer regionId) {
-        final String url = urlBuilder.get().getCities()
+    public List<City> getCitiesByCountryAndRegion(Integer countryId, Integer regionId) {
+        int offset = 0;
+        final int count = 100;
+        final VkUrlBuilder urlBuilder = this.urlBuilder.get().getCities()
                 .countryId(countryId)
-                .regionId( regionId)
-                .needAll()
-                .build();
-        return executeGet(url, GetCitiesResponse.class);
+                .regionId(regionId)
+                .offset(offset)
+                .count(count);
+        GetCitiesResponse response = executeGet(urlBuilder
+                .build(), GetCitiesResponse.class);
+        List<City> res = new ArrayList<>(response.getItems());
+        while (response.getItems().size() != 0) {
+            Utils.sleep(timeout);
+            offset += count;
+            urlBuilder.offset(offset);
+            response = executeGet(urlBuilder.build(), GetCitiesResponse.class);
+            res.addAll(response.getItems());
+            if (res.size() == response.getCount()) {
+                break;
+            }
+        }
+        return res;
     }
 
 
