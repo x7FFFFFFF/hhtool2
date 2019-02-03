@@ -7,8 +7,16 @@ import ru.alex.vic.json.vk.Country;
 import ru.alex.vic.json.vk.Region;
 
 import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "vklocation",indexes = {
+        @Index(name = "index_vklocation_name", columnList = "name"),
+        @Index(name = "index_vklocation_parentvendorid", columnList = "parentvendorid"),
+        @Index(name = "index_vklocation_vendorid", columnList = "vendorid"),
+        @Index(name = "index_vklocation_locationtype", columnList = "locationtype")
+})
 public class VkLocation extends Location {
 
     public VkLocation() {

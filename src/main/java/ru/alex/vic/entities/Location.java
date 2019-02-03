@@ -17,20 +17,21 @@ public class Location {
     @UpdateTimestamp
     private LocalDateTime modified;
 
-    @Column(nullable = false)
-    private String  name;
+
+    @Column(name = "name", nullable = false)
+    private String name;
 
     @Column(nullable = false)
     private Boolean hasChilds;
 
 
-    @Column
+    @Column(name = "parentvendorid")
     private Long parentVendorId;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "vendorid", nullable = false)
     private Long vendorId;
 
-    @Column(length = 10)
+    @Column(name = "locationtype", length = 10)
     @Enumerated(EnumType.STRING)
     private LocationType locationType;
 
