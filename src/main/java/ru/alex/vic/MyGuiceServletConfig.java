@@ -17,6 +17,7 @@ import ru.alex.vic.dao.Dao;
 import ru.alex.vic.dao.hh.HHLocationDao;
 import ru.alex.vic.dao.vk.VkLocationDao;
 import ru.alex.vic.entities.hh.HHLocation;
+import ru.alex.vic.entities.vk.VkLocation;
 
 import java.util.Properties;
 
@@ -39,6 +40,8 @@ public class MyGuiceServletConfig extends GuiceServletContextListener {
 
                 bind(new TypeLiteral<Dao<Long, HHLocation>>() {
                 }).to(HHLocationDao.class);
+                bind(new TypeLiteral<Dao<Long, VkLocation>>() {
+                }).to(VkLocationDao.class);
 
                 for (Class<?> resource : rc.getClasses()) {
                     System.out.println("Binding resource: " + resource.getName());
