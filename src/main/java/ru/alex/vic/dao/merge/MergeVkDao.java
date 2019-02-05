@@ -1,27 +1,25 @@
-package ru.alex.vic.dao.hh;
+package ru.alex.vic.dao.merge;
 
-import com.google.inject.Provider;
 import ru.alex.vic.dao.Dao;
-import ru.alex.vic.entities.hh.HHLocation;
+import ru.alex.vic.entities.merge.MergeVk;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 
-
 @Singleton
-public class HHLocationDao implements Dao<Long, HHLocation> {
-
+public class MergeVkDao implements Dao<Long, MergeVk> {
     private final Provider<EntityManager> em;
 
     @Inject
-    public HHLocationDao(Provider<EntityManager> em) {
+    public MergeVkDao(Provider<EntityManager> em) {
         this.em = em;
     }
 
     @Override
     public Class<?> getEntityClass() {
-        return HHLocation.class;
+        return MergeVk.class;
     }
 
     @Override

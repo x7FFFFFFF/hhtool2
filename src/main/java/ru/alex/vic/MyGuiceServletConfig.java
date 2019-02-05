@@ -15,8 +15,10 @@ import ru.alex.vic.client.HttpClient;
 import ru.alex.vic.client.hh.HHClient;
 import ru.alex.vic.dao.Dao;
 import ru.alex.vic.dao.hh.HHLocationDao;
+import ru.alex.vic.dao.merge.MergeVkDao;
 import ru.alex.vic.dao.vk.VkLocationDao;
 import ru.alex.vic.entities.hh.HHLocation;
+import ru.alex.vic.entities.merge.MergeVk;
 import ru.alex.vic.entities.vk.VkLocation;
 
 import java.util.Properties;
@@ -42,6 +44,8 @@ public class MyGuiceServletConfig extends GuiceServletContextListener {
                 }).to(HHLocationDao.class);
                 bind(new TypeLiteral<Dao<Long, VkLocation>>() {
                 }).to(VkLocationDao.class);
+                bind(new TypeLiteral<Dao<Long, MergeVk>>() {
+                }).to(MergeVkDao.class);
 
                 for (Class<?> resource : rc.getClasses()) {
                     System.out.println("Binding resource: " + resource.getName());
@@ -51,6 +55,7 @@ public class MyGuiceServletConfig extends GuiceServletContextListener {
                 bind(HHClient.class);
                 bind(VkLocationDao.class);
                 serve("/services/*").with(GuiceContainer.class);
+                serve("/*").with(MainServlet.class);
             }
         });
     }

@@ -13,6 +13,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import java.util.List;
 
 import static javax.ws.rs.core.MediaType.TEXT_HTML;
@@ -51,10 +52,10 @@ public class VkService {
      * @return
      */
     @GET
-    @Path("loadLocations")
+    @Path("loadRegions")
     @Produces(TEXT_HTML)
     /*@Transactional*/
-    public String loadLocations() {
+    public String loadRegions(@QueryParam("id") String countryCode) {
         //final String[] codes = {"RU", "UA", "KZ", "AZ", "BY", "GE", "KG", "UZ"};
         final TaskStatus task = service.startTask(LOAD_LOCATIONS);
         if (task.isRunning()) {
@@ -64,20 +65,23 @@ public class VkService {
 
 
         vkLocationDao.deleteAll();
-        final String[] codes = {"RU"};
-        final GetCountriesResponse countriesByCode = vkClient.getCountriesByCode(codes);
+        //final String[] codes = {"RU"};
+        final GetCountriesResponse countriesByCode = vkClient.getCountriesByCode(countryCode);
         for (Country country : countriesByCode.getItems()) {
             vkLocationDao.save(new VkLocation(country));
         }
+        int count = 0;
 
         for (Country country : countriesByCode.getItems()) {
             final GetRegionsResponse regionsByCountryCode = vkClient.getRegionsByCountryCode(country.getId());
             //sleep(timeout);
             for (Region region : regionsByCountryCode.getItems()) {
                 vkLocationDao.save(new VkLocation(region, country));
+                count++;
+                task.setComplete(count);
             }
-            //final Integer regionsTotal = regionsByCountryCode.getCount();
-            int count = 0;
+       /*     //final Integer regionsTotal = regionsByCountryCode.getCount();
+
             for (Region region : regionsByCountryCode.getItems()) {
                 System.out.println("region = " + region);
                 final List<City> citiesByCountryAndRegion = vkClient.getCitiesByCountryAndRegion(country.getId(), region.getId());
@@ -87,7 +91,8 @@ public class VkService {
                 }
                 count++;
                 task.setComplete(count);
-            }
+            }*/
+
         }
         task.stop();
         return task.toString();

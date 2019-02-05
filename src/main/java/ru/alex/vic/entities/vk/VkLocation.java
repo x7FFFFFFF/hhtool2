@@ -6,9 +6,8 @@ import ru.alex.vic.json.vk.City;
 import ru.alex.vic.json.vk.Country;
 import ru.alex.vic.json.vk.Region;
 
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Collection;
 
 @Entity
 @Table(name = "vklocation",indexes = {
@@ -21,6 +20,15 @@ public class VkLocation extends Location {
 
     public VkLocation() {
     }
+
+   /* @ManyToOne
+    @JoinTable(
+            name = "roles_privileges",
+            joinColumns = @JoinColumn(
+                    name = "role_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "privilege_id", referencedColumnName = "id"))
+    private Collection<Privilege> privileges;*/
 
     public VkLocation(Country json) {
         this.setVendorId(json.getId().longValue());
