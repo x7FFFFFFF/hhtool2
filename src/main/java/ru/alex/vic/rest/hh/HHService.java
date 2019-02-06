@@ -12,6 +12,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import java.util.function.Consumer;
 
@@ -37,15 +38,13 @@ public class HHService {
      */
     @GET
     @Path("loadLocations")
-    @Produces(TEXT_HTML)
+    @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public String loadLocations() {
+    public HHLocationJson[] loadLocations() {
         this.dao.deleteAll();
         final HHLocationJson[] locations = hhClient.getLocations();
         iterate(locations, this.dao::save);
-        String html = "<h2>Done</h2> Count:" + locations.length;
-
-        return html;
+        return locations;
     }
 
 

@@ -5,41 +5,59 @@
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>jQuery, Ajax and Servlet/JSP integration example</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>jQuery, Ajax and Servlet/JSP integration example</title>
 
-<script src="https://code.jquery.com/jquery-1.10.2.js"
-	type="text/javascript"></script>
-<script type="text/javascript">
-    var api = '/hhtool2/services/';
-    $(document).ready(function() {
-            $('#loadHHLocations').click(function(event) {
-                    //var name = $('#userName').val();
-                    $.get(api +'hh/loadLocations', {
+    <script src="https://code.jquery.com/jquery-1.10.2.js" 	type="text/javascript" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="/hhtool2/js/app-ajax.js"></script>
 
-                    }, function(responseText) {
-                            $('#ajaxGetUserServletResponse').text(responseText);
-                    });
-            });
-            $('#loadVkRegions').click(function(event) {
-                                let countryCode = $('#countryCode').val();
-                                $.get(api +'vk/loadRegions', {
-                                    id:countryCode
-                                }, function(responseText) {
-                                        $('#ajaxGetUserServletResponse').text(responseText);
-                                });
-             });
+    <style>
+        input {
+            width:300px;
+            }
+         .template {
+            display:none;
+         }
 
-
-    });
-
-</script>
+    </style>
 </head>
 <body>
 
 	<form>
-		 <input type="button" id="loadHHLocations" value="Load HH Locations" /><br />
-		  Country code: <input type="text" id="countryCode" /> <input type="button" id="loadVkRegions" value="Load VK Regions" />
+	     <table>
+	        <tr>
+	            <td>&nbsp;</td>
+		        <td><input class="button" type="button" id="hh_loadLocations" value="Load HH Locations" /></td>
+		    </tr>
+		    <tr>
+		        <td> Country code: <input class="input" type="text" id="vk_loadRegions_id" value="RU" /> </td>
+		        <td> <input class="button" type="button" id="vk_loadRegions" value="Load VK Regions" />
+		            <div class="template" id="vk_loadRegions_template">
+                        <ul>
+                          <li>name: {{name}}</li>
+                          <li>complete: {{complete}}</li>
+                          <li>status: {{status}}</li>
+                        </ul>
+
+                	</div>
+		        </td>
+		    </tr>
+		    <tr>
+		         <td>&nbsp;</td>
+                 <td><input class="button" type="button" id="merge_mergeCountries" value="Merge Countries" /></td>
+		    </tr>
+
+		     <tr>
+                  <td> Country code: <input class="input" type="text" id="merge_mergeRegions_id" value="113" /> </td>
+            	  <td> <input class="button" type="button" id="merge_mergeRegions" value="Merge child regions" /></td>
+             </tr>
+
+             <tr>
+                   <td> <input class="input" type="text" id="vk_searchLocation_id" value="" /> </td>
+                   <td> <input class="button" type="button" id="vk_searchLocation" value="Search VK location" /></td>
+             </tr>
+		  </table>
 
 	</form>
 	<br>
@@ -47,5 +65,7 @@
 
 	<strong>Ajax Response</strong>:
 	<div id="ajaxGetUserServletResponse"></div>
+
+
 </body>
 </html>

@@ -13,6 +13,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,39 +42,34 @@ public class MergeService {
 
     @GET
     @Path("clearMergeTable")
-    @Produces(TEXT_HTML)
-    public String  clearMergeTable(){
+    @Produces(MediaType.APPLICATION_JSON)
+    public String clearMergeTable() {
         final List<MergeVk> mergeVks = mergeDao.getAll();
         for (MergeVk mergeVk : mergeVks) {
             final List<VkLocation> vkLocations = mergeVk.getVkLocations();
             //vkLocationDao.update(mergeVk.getVkLocations(), loc->loc.s);
         }
 
-
         return "OK";
     }
 
 
-
-
-
     @GET
     @Path("mergeCountries")
-    @Produces({TEXT_HTML}) //2019 Московская область  //Россия 113
-    public String mergeCountries() {
+    @Produces(MediaType.APPLICATION_JSON) //2019 Московская область  //Россия 113
+    public List<HHLocation> mergeCountries() {
         Map<String, Object> params = new HashMap<>();
         params.put("locationType", LocationType.COUNTRY);
         final List<HHLocation> hhRegions = hhLocationDao.findByFields(params);
-        StringBuilder builder = new StringBuilder();
         for (HHLocation hhRegion : hhRegions) {
-            builder.append(mergeCountry(hhRegion));
+            mergeCountry(hhRegion);
         }
 
-        return builder.toString();
+        return hhRegions;
 
     }
 
-    private String mergeCountry(HHLocation hhCountry) {
+    private void mergeCountry(HHLocation hhCountry) {
         clear(hhCountry);
         Map<String, Object> params = new HashMap<>();
         params.put("locationType", LocationType.COUNTRY);
@@ -85,9 +81,6 @@ public class MergeService {
         if (hasOneVariant) {
             hhCountry.setResolved(true);
             hhLocationDao.save(hhCountry);
-            return "Success:" + hhCountry +"\n";
-        } else {
-            return "Fail:" + hhCountry + "; variants found = " + vkCountries.size()+"\n";
         }
     }
 
@@ -99,15 +92,14 @@ public class MergeService {
 
     @GET
     @Path("mergeRegions")
-    @Produces(TEXT_HTML) //2019 Московская область  //Россия 113
-    public String mergeRegions(@QueryParam("id") Integer hhCountryCode) {
+    @Produces(MediaType.APPLICATION_JSON) //2019 Московская область  //Россия 113
+    public List<HHLocation> mergeRegions(@QueryParam("id") Integer hhCountryCode) {
         Map<String, Object> params = new HashMap<>();
         params.put("locationType", LocationType.REGION);
         params.put("parentVendorId", hhCountryCode);
         final List<HHLocation> hhRegions = hhLocationDao.findByFields(params);
-        StringBuilder builder = new StringBuilder();
         for (HHLocation hhRegion : hhRegions) {
-            builder.append(merge(hhRegion));
+            merge(hhRegion);
         }
 
 
@@ -119,12 +111,12 @@ public class MergeService {
                 mergeCity(city, vkLocationList.get(0));
             }
         }*/
-        return builder.toString();
+        return hhRegions;
     }
 
-    private String merge(HHLocation hhRegion) {
+    private void merge(HHLocation hhRegion) {
         clear(hhRegion);
-        final List<VkLocation> vkLocationList = vkLocationDao.findByField("name", hhRegion.getName());
+        final List<VkLocation> vkLocationList = vkLocationDao.findByField("name", replaceRepublic(hhRegion.getName()));
         final boolean hasOneVariant = vkLocationList.size() == 1;
         MergeVk mergeVk = createMergeVk(hhRegion, vkLocationList, hasOneVariant);
         mergeDao.save(mergeVk);
@@ -132,10 +124,12 @@ public class MergeService {
         if (hasOneVariant) {
             hhRegion.setResolved(true);
             hhLocationDao.save(hhRegion);
-            return "Success:" + hhRegion;
-        } else {
-            return "Fail:" + hhRegion + "; variants found = " + vkLocationList.size();
         }
+    }
+
+    String replaceRepublic(String name) {
+        final String prefix = "Республика";
+        return (name.startsWith(prefix)) ? name.substring(prefix.length()).trim() : name.trim();
     }
 
     public MergeVk createMergeVk(HHLocation hhLocation, List<VkLocation> vkLocationList, boolean hasOneVariant) {

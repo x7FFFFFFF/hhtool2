@@ -1,5 +1,6 @@
 package ru.alex.vic;
 
+import com.google.gson.Gson;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
@@ -54,8 +55,9 @@ public class MyGuiceServletConfig extends GuiceServletContextListener {
                 bind(HttpClient.class);
                 bind(HHClient.class);
                 bind(VkLocationDao.class);
+                bind(Gson.class);
                 serve("/services/*").with(GuiceContainer.class);
-                serve("/*").with(MainServlet.class);
+                serve("/main").with(MainServlet.class);
             }
         });
     }

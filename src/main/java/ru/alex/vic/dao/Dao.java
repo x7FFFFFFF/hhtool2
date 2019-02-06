@@ -17,8 +17,37 @@ public interface Dao<I, T> {
 
 
     default List<T> getAll() {
-        final TypedQuery<?> typedQuery = getTypedQuery(Collections.emptyMap());
+        final TypedQuery<?> typedQuery = getTypedQuery(Collections.emptyMap(), PredicateType.EQUAL);
         return (List<T>) typedQuery.getResultList();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    default T findById(I id) {
+        final EntityManager entityManager = getEntityManager();
+        final Object obj = entityManager.find(getEntityClass(), id);
+        return (T) obj;
+    }
+
+
+    default List<T> findByField(String fieldName, Object value) {
+        TypedQuery<?> typed = getTypedQuery(Collections.singletonMap(fieldName, value), PredicateType.EQUAL);
+        return (List<T>) typed.getResultList();
+    }
+
+    default List<T> findByFieldLike(String fieldName, String value) {
+        TypedQuery<?> typed = getTypedQuery(Collections.singletonMap(fieldName, value), PredicateType.LIKE);
+        return (List<T>) typed.getResultList();
+    }
+
+
+    default List<T> findByFields(Map<String, Object> params) {
+        TypedQuery<?> typed = getTypedQuery(params, PredicateType.EQUAL);
+        return (List<T>) typed.getResultList();
+    }
+
+    default T findByFieldSingle(String fieldName, Object value) {
+        return (T) getTypedQuery(Collections.singletonMap(fieldName, value), PredicateType.EQUAL).getSingleResult();
     }
 
 
@@ -28,50 +57,16 @@ public interface Dao<I, T> {
         entityManager.persist(enity);
     }
 
-    @SuppressWarnings("unchecked")
-    default T getById(I id) {
+
+    @Transactional
+    default void update(List<T> entities, Consumer<T> consumer) {
         final EntityManager entityManager = getEntityManager();
-        final Object obj = entityManager.find(getEntityClass(), id);
-        return (T) obj;
-    }
-
-
-
-    default List<T> findByField(String fieldName, Object value) {
-        TypedQuery<?> typed = getTypedQuery(Collections.singletonMap(fieldName, value));
-        return (List<T>) typed.getResultList();
-    }
-
-
-
-    default List<T> findByFields(Map<String, Object> params) {
-        TypedQuery<?> typed = getTypedQuery(params);
-        return (List<T>) typed.getResultList();
-    }
-
-
-    default TypedQuery<?> getTypedQuery(Map<String, Object> params) {
-        final EntityManager entityManager = getEntityManager();
-        final Class<?> entityClass = getEntityClass();
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        final CriteriaQuery criteria = builder.createQuery(entityClass);
-        Root<?> from = criteria.from(entityClass);
-        criteria.select(from);
-        Predicate[] predicates = new Predicate[params.size()];
-        int count = 0;
-        for (Map.Entry<String, Object> entry : params.entrySet()) {
-            predicates[count] = builder.equal(from.get(entry.getKey()), entry.getValue());
-            count++;
+        for (T entity : entities) {
+            consumer.accept(entity);
+            entityManager.merge(entity);
         }
-        criteria.where(predicates);
-        return entityManager.createQuery(criteria);
     }
 
-
-    default T findByFieldSingle(String fieldName, Object value) {
-
-        return (T) getTypedQuery(Collections.singletonMap(fieldName, value)).getSingleResult();
-    }
 
     @Transactional
     default void delete(T entity) {
@@ -86,16 +81,6 @@ public interface Dao<I, T> {
             entityManager.remove(entity);
         }
     }
-
-    @Transactional
-    default void update(List<T> entities, Consumer<T> consumer) {
-        final EntityManager entityManager = getEntityManager();
-        for (T entity : entities) {
-            consumer.accept(entity);
-            entityManager.merge(entity);
-        }
-    }
-
 
 
     @Transactional
@@ -112,6 +97,34 @@ public interface Dao<I, T> {
     Class<?> getEntityClass();
 
     EntityManager getEntityManager();
+
+    enum PredicateType {
+        EQUAL, LIKE
+    }
+
+    default TypedQuery<?> getTypedQuery(Map<String, Object> params, PredicateType queryType) {
+        final EntityManager entityManager = getEntityManager();
+        final Class<?> entityClass = getEntityClass();
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        final CriteriaQuery criteria = builder.createQuery(entityClass);
+        Root<?> from = criteria.from(entityClass);
+        criteria.select(from);
+        Predicate[] predicates = new Predicate[params.size()];
+        int count = 0;
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
+            switch (queryType) {
+                case EQUAL:
+                    predicates[count] = builder.equal(from.get(entry.getKey()), entry.getValue());
+                    break;
+                case LIKE:
+                    predicates[count] = builder.like(from.get(entry.getKey()), entry.getValue().toString());
+                    break;
+            }
+            count++;
+        }
+        criteria.where(predicates);
+        return entityManager.createQuery(criteria);
+    }
 
 
 }

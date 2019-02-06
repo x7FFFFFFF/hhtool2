@@ -30,9 +30,9 @@ public class HttpClient {
     private final Gson gson;
 
     @Inject
-    public HttpClient(@Named(APP_HTTPCLIENT_CONN_TIME_TO_LIVE) int connTimeToLive) {
+    public HttpClient(@Named(APP_HTTPCLIENT_CONN_TIME_TO_LIVE) int connTimeToLive, Gson gson) {
         this.connTimeToLive = connTimeToLive;
-        this.gson = new Gson();
+        this.gson = gson;
     }
 
     public <T> T get(String url, Class<T> clz) {
@@ -57,7 +57,7 @@ public class HttpClient {
              JsonReader jsonReader = new JsonReader(reader)
         ) {
             JsonObject json = (JsonObject) new JsonParser().parse(jsonReader);
-            return function.apply(getGson(),json);
+            return function.apply(getGson(), json);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

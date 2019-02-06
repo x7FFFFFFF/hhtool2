@@ -14,8 +14,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_HTML;
 import static ru.alex.vic.Utils.sleep;
 
@@ -53,13 +56,13 @@ public class VkService {
      */
     @GET
     @Path("loadRegions")
-    @Produces(TEXT_HTML)
+    @Produces(MediaType.APPLICATION_JSON)
     /*@Transactional*/
-    public String loadRegions(@QueryParam("id") String countryCode) {
+    public TaskStatus loadRegions(@QueryParam("id") String countryCode) {
         //final String[] codes = {"RU", "UA", "KZ", "AZ", "BY", "GE", "KG", "UZ"};
         final TaskStatus task = service.startTask(LOAD_LOCATIONS);
         if (task.isRunning()) {
-            return task.toString();
+            return task;
         }
         task.start();
 
@@ -95,7 +98,16 @@ public class VkService {
 
         }
         task.stop();
-        return task.toString();
+        return task;
+    }
+
+
+    @GET
+    @Path("searchLocation")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<VkLocation> searchLocation(@QueryParam("id") String name) {
+        final List<VkLocation> locations = vkLocationDao.findByFieldLike("name", name);
+        return locations;
     }
 
 
