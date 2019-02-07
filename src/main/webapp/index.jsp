@@ -21,6 +21,9 @@
          .template {
             display:none;
          }
+         .ui-icon-circle-close {
+             cursor:pointer;
+         }
 
     </style>
 </head>
@@ -66,7 +69,11 @@
 	<br>
 
 	<strong>Ajax Response</strong>:
-	<div id="ajaxGetUserServletResponse"></div>
+	<div id="ajaxGetUserServletResponse">
+         <ul></ul>
+
+
+    </div>
 
 
 </body>
