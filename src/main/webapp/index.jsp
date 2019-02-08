@@ -105,24 +105,39 @@
                               {{/items}}
                            </table>
 
-            </script>
+
+
+    </script>
+
+    <script id="hh_loadLocations_template" type="text/mustache">
+                           count = {{count}} <br />
+
+
+
+    </script>
+    <script type="text/javascript">
+        Binding.apiBase('/hhtool2/services/').bind('#controls', '#output');
+    </script>
 </head>
 <body>
 
-	<form>
-	     <table>
-	        <tr>
-	            <td>&nbsp;</td>
-		        <td><input class="button" type="button" id="hh_loadLocations" value="Load HH Locations" /></td>
-		    </tr>
-		    <tr>
-		        <td> Country code: <input class="input" type="text" id="vk_loadRegions_id" value="RU" /> </td>
-		        <td> <input class="button" type="button" id="vk_loadRegions" value="Load VK Regions" /> </td>
-		    </tr>
-		    <tr>
-		         <td>&nbsp;</td>
-                 <td><input class="button" type="button" id="merge_mergeCountries" value="Merge Countries" /></td>
-		    </tr>
+<form id="controls">
+    <table>
+        <tr>
+            <td>&nbsp;</td>
+            <td><input class="button" type="button" id="hh_loadLocations" value="Load HH Locations"
+                       data-output-id="output"
+                       data-url="hh/loadLocations" data-parms-id="id^=hh_"
+                       data-teplate-id="#hh_loadLocations_template"/></td>
+        </tr>
+        <tr>
+            <td> Country code: <input class="input" type="text" id="vk_loadRegions_id" value="RU"/></td>
+            <td><input class="button" type="button" id="vk_loadRegions" value="Load VK Regions"/></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td><input class="button" type="button" id="merge_mergeCountries" value="Merge Countries"/></td>
+        </tr>
 
 		     <tr>
                   <td> Country code: <input class="input" type="text" id="merge_mergeRegions_id" value="113" /> </td>
@@ -139,13 +154,14 @@
 	<br>
 	<br>
 
-	<strong>Ajax Response</strong>:
-	<div id="ajaxGetUserServletResponse">
-         <ul></ul>
+<strong>Ajax Response</strong>:
+<div id="output">
+    <ul></ul>
 
 
     </div>
 
 
 </body>
+
 </html>
