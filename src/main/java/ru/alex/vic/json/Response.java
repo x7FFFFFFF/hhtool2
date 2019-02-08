@@ -1,5 +1,8 @@
 package ru.alex.vic.json;
 
+import ru.alex.vic.json.hh.HHLocationJson;
+
+import java.util.Arrays;
 import java.util.List;
 
 public class Response<T> {
@@ -12,6 +15,10 @@ public class Response<T> {
     public Response(int count, List<T> items) {
         this.count = count;
         this.items = items;
+    }
+
+    public static <T>  Response<T> of(T[] locations) {
+        return Response.of(Arrays.asList(locations));
     }
 
     public int getCount() {

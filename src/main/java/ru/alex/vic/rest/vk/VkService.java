@@ -4,9 +4,11 @@ import ru.alex.vic.client.vk.VkClient;
 import ru.alex.vic.dao.vk.VkLocationDao;
 import ru.alex.vic.entities.vk.VkLocation;
 import ru.alex.vic.json.Response;
-import ru.alex.vic.json.vk.*;
+import ru.alex.vic.json.vk.Country;
+import ru.alex.vic.json.vk.GetCountriesResponse;
+import ru.alex.vic.json.vk.GetRegionsResponse;
+import ru.alex.vic.json.vk.Region;
 import ru.alex.vic.rest.Service;
-import ru.alex.vic.rest.TaskStatus;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -18,11 +20,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.TEXT_HTML;
-import static ru.alex.vic.Utils.sleep;
 
 @Singleton
 @Path("vk")
@@ -82,9 +79,9 @@ public class VkService {
     @GET
     @Path("searchLocation")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<VkLocation> searchLocation(@QueryParam("id") String name) {
+    public Response<VkLocation> searchLocation(@QueryParam("id") String name) {
         final List<VkLocation> locations = vkLocationDao.findByFieldLike("name", name);
-        return locations;
+        return Response.of(locations);
     }
 
 

@@ -8,6 +8,10 @@
     let dataOutputId = 'data-output-id';
     let document = global.document;
     let apiBase = '';
+    let controlsId ='';
+    let outputId ='';
+    let defaultTemplateId = null;
+
     let loadParams = function (button, context) {
         let res = {};
         if (button.hasAttribute(dataParmsId)) {
@@ -36,16 +40,36 @@
         return null;
     }
 
+    function getTemplateId(el){
+         let  val = getAttr(el, dataTeplateId);
+         if (val === null) {
+            return defaultTemplateId;
+         }
+         return val;
+    }
+
     global.Binding.apiBase = function (str) {
         apiBase = str;
         return global.Binding;
     }
+    global.Binding.controlsId = function (id) {
+            controlsId = id;
+            return global.Binding;
+    }
+    global.Binding.outputId = function (id) {
+            outputId = id;
+            return global.Binding;
+    }
+    global.Binding.defaultTemplateId = function (id) {
+            defaultTemplateId = id;
+            return global.Binding;
+    }
 
 
-    global.Binding.bind = function (id, tabId) {
+    global.Binding.bind = function () {
         let init = function () {
-            let main = $(id);
-            let tab = $(tabId);
+            let main = $(controlsId);
+            let tab = $(outputId);
 
             let onTabClose = function () {
                 var panelId = $(this).closest("li").remove().attr("aria-controls");
@@ -56,7 +80,7 @@
 
 
             let loadTab = function (url, data) {
-                let ul = $(tabId + '>ul');
+                let ul = $(outputId + '>ul');
                 let tabHeaders = ul.children();
                 let tabName = url.replace(/\//g, '_') + '_tab_' + (tabHeaders.length + 1);
                 ul.append('<li><a href="#' + tabName + '">' + url + '</a><span class="ui-icon ui-icon-close" role="presentation">Remove Tab</span>');//<span class="ui-icon ui-icon-circle-close ui-closable-tab"></span>
@@ -67,7 +91,7 @@
             let onClick = function (e) {
                 let param = loadParams(this, main);
                 let url = getUrl(this);
-                let templateId = getAttr(this, dataTeplateId);
+                let templateId = getTemplateId(this);
                 let template = $(templateId)[0].innerHTML;
                 let onResponce = function (data) {
                     if (templateId === null) {

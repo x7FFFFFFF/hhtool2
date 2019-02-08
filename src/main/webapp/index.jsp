@@ -46,36 +46,7 @@
                 </table>
 
      </script>
-      <script id="merge_mergeCountries_template" type="text/mustache">
-                     count = {{count}} <br />
-                     <table>
-                     <tr>
-                          <td>hhLocation.id</td>
-                          <td>hhLocation.name</td>
-                          <td>hhLocation.resolved</td>
-                          <td>hhLocation.locationType</td>
-                          <td>vklocations</td>
-                     </tr>
 
-                        {{#items}}
-                             <tr>
-                                 <td>{{hhLocation.id}}</td>
-                                 <td>{{hhLocation.name}}</td>
-                                 <td>{{hhLocation.resolved}}</td>
-                                 <td>{{hhLocation.locationType}}</td>
-                                 <td>
-                                        {{#vkLocations}}
-                                                {{id}}  {{name}} <br />
-
-                                        {{/vkLocations}}
-
-                                 </td>
-
-                             </tr>
-                        {{/items}}
-                     </table>
-
-      </script>
       <script id="merge_mergeRegions_template" type="text/mustache">
                            count = {{count}} <br />
                            <table>
@@ -109,14 +80,18 @@
 
     </script>
 
-    <script id="hh_loadLocations_template" type="text/mustache">
+    <script id="default_template" type="text/mustache">
                            count = {{count}} <br />
+                            {{#items}}
+
+                                        {{id}} &nbsp;{{name}}  &nbsp;{{title}}<br />
 
 
+                             {{/items}}
 
     </script>
     <script type="text/javascript">
-        Binding.apiBase('/hhtool2/services/').bind('#controls', '#output');
+        Binding.apiBase('/hhtool2/services/').controlsId('#controls').outputId('#output').defaultTemplateId('#default_template').bind();
     </script>
 </head>
 <body>
@@ -126,27 +101,30 @@
         <tr>
             <td>&nbsp;</td>
             <td><input class="button" type="button" id="hh_loadLocations" value="Load HH Locations"
-                       data-output-id="output"
-                       data-url="hh/loadLocations" data-parms-id="id^=hh_"
-                       data-teplate-id="#hh_loadLocations_template"/></td>
+                       data-url="hh/loadLocations"    /></td>
         </tr>
         <tr>
-            <td> Country code: <input class="input" type="text" id="vk_loadRegions_id" value="RU"/></td>
-            <td><input class="button" type="button" id="vk_loadRegions" value="Load VK Regions"/></td>
+            <td> Country code: <input class="input" name="id" type="text" id="vk_loadRegions_id" value="RU"/></td>
+            <td><input class="button" type="button" id="vk_loadRegions" value="Load VK Regions"
+                       data-url="vk/loadRegions"  data-parms-id="id^=vk_loadRegions"  data-teplate-id="#vk_loadRegions_template"/></td>
         </tr>
         <tr>
             <td>&nbsp;</td>
-            <td><input class="button" type="button" id="merge_mergeCountries" value="Merge Countries"/></td>
+            <td><input class="button" type="button" id="merge_mergeCountries" value="Merge Countries"
+                    data-url="merge/mergeCountries"   data-teplate-id="#merge_mergeRegions_template"/></td>
         </tr>
 
 		     <tr>
-                  <td> Country code: <input class="input" type="text" id="merge_mergeRegions_id" value="113" /> </td>
-            	  <td> <input class="button" type="button" id="merge_mergeRegions" value="Merge child regions" /></td>
+                  <td> Country code: <input class="input" name="id" type="text" id="merge_mergeRegions_id" value="113" /> </td>
+            	  <td> <input class="button" type="button" id="merge_mergeRegions" value="Merge child regions"
+            	        data-url="merge/mergeRegions"    data-parms-id="id^=merge_mergeRegions" data-teplate-id="#merge_mergeRegions_template"
+            	        /></td>
              </tr>
 
              <tr>
-                   <td> <input class="input" type="text" id="vk_searchLocation_id" value="" /> </td>
-                   <td> <input class="button" type="button" id="vk_searchLocation" value="Search VK location" /></td>
+                   <td> <input class="input" name="id" type="text" id="vk_searchLocation_id" value="" /> </td>
+                   <td> <input class="button" type="button" id="vk_searchLocation" value="Search VK location"
+                        data-url="vk/searchLocation"    data-parms-id="id^=vk_searchLocation"                /></td>
              </tr>
 		  </table>
 

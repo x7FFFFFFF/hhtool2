@@ -5,6 +5,7 @@ import ru.alex.vic.client.hh.HHClient;
 import ru.alex.vic.dao.Dao;
 import ru.alex.vic.entities.LocationType;
 import ru.alex.vic.entities.hh.HHLocation;
+import ru.alex.vic.json.Response;
 import ru.alex.vic.json.hh.HHLocationJson;
 
 import javax.inject.Inject;
@@ -40,11 +41,11 @@ public class HHService {
     @Path("loadLocations")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public HHLocationJson[] loadLocations() {
+    public Response<HHLocationJson> loadLocations() {
         this.dao.deleteAll();
         final HHLocationJson[] locations = hhClient.getLocations();
         iterate(locations, this.dao::save);
-        return locations;
+        return Response.of(locations);
     }
 
 
