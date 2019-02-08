@@ -28,6 +28,84 @@
            #ajaxGetUserServletResponse li .ui-icon-close { float: left; margin: 0.4em 0.2em 0 0; cursor: pointer; }
 
     </style>
+    <script id="vk_loadRegions_template" type="text/mustache">
+                count = {{count}} <br />
+                <table>
+                <tr>
+                     <td>id</td>
+                     <td>title</td>
+                </tr>
+
+                   {{#items}}
+                        <tr>
+                            <td>{{id}}</td>
+                            <td>{{title}}</td>
+
+                        </tr>
+                   {{/items}}
+                </table>
+
+     </script>
+      <script id="merge_mergeCountries_template" type="text/mustache">
+                     count = {{count}} <br />
+                     <table>
+                     <tr>
+                          <td>hhLocation.id</td>
+                          <td>hhLocation.name</td>
+                          <td>hhLocation.resolved</td>
+                          <td>hhLocation.locationType</td>
+                          <td>vklocations</td>
+                     </tr>
+
+                        {{#items}}
+                             <tr>
+                                 <td>{{hhLocation.id}}</td>
+                                 <td>{{hhLocation.name}}</td>
+                                 <td>{{hhLocation.resolved}}</td>
+                                 <td>{{hhLocation.locationType}}</td>
+                                 <td>
+                                        {{#vkLocations}}
+                                                {{id}}  {{name}} <br />
+
+                                        {{/vkLocations}}
+
+                                 </td>
+
+                             </tr>
+                        {{/items}}
+                     </table>
+
+      </script>
+      <script id="merge_mergeRegions_template" type="text/mustache">
+                           count = {{count}} <br />
+                           <table>
+                           <tr>
+                                <td>hhLocation.id</td>
+                                <td>hhLocation.name</td>
+                                <td>hhLocation.resolved</td>
+                                <td>hhLocation.locationType</td>
+                                <td>vklocations</td>
+                           </tr>
+
+                              {{#items}}
+                                   <tr>
+                                       <td>{{hhLocation.id}}</td>
+                                       <td>{{hhLocation.name}}</td>
+                                       <td>{{hhLocation.resolved}}</td>
+                                       <td>{{hhLocation.locationType}}</td>
+                                       <td>
+                                              {{#vkLocations}}
+                                                      {{id}}  {{name}} <br />
+
+                                              {{/vkLocations}}
+
+                                       </td>
+
+                                   </tr>
+                              {{/items}}
+                           </table>
+
+            </script>
 </head>
 <body>
 
@@ -39,16 +117,7 @@
 		    </tr>
 		    <tr>
 		        <td> Country code: <input class="input" type="text" id="vk_loadRegions_id" value="RU" /> </td>
-		        <td> <input class="button" type="button" id="vk_loadRegions" value="Load VK Regions" />
-		            <div class="template" id="vk_loadRegions_template">
-                        <ul>
-                          <li>name: {{name}}</li>
-                          <li>complete: {{complete}}</li>
-                          <li>status: {{status}}</li>
-                        </ul>
-
-                	</div>
-		        </td>
+		        <td> <input class="button" type="button" id="vk_loadRegions" value="Load VK Regions" /> </td>
 		    </tr>
 		    <tr>
 		         <td>&nbsp;</td>

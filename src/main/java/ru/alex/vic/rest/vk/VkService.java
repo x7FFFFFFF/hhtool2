@@ -3,6 +3,7 @@ package ru.alex.vic.rest.vk;
 import ru.alex.vic.client.vk.VkClient;
 import ru.alex.vic.dao.vk.VkLocationDao;
 import ru.alex.vic.entities.vk.VkLocation;
+import ru.alex.vic.json.Response;
 import ru.alex.vic.json.vk.*;
 import ru.alex.vic.rest.Service;
 import ru.alex.vic.rest.TaskStatus;
@@ -15,6 +16,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,48 +59,23 @@ public class VkService {
     @GET
     @Path("loadRegions")
     @Produces(MediaType.APPLICATION_JSON)
-    /*@Transactional*/
-    public TaskStatus loadRegions(@QueryParam("id") String countryCode) {
-        //final String[] codes = {"RU", "UA", "KZ", "AZ", "BY", "GE", "KG", "UZ"};
-        final TaskStatus task = service.startTask(LOAD_LOCATIONS);
-        if (task.isRunning()) {
-            return task;
-        }
-        task.start();
-
+    public Response<Region> loadRegions(@QueryParam("id") String countryCode) {
 
         vkLocationDao.deleteAll();
-        //final String[] codes = {"RU"};
+
         final GetCountriesResponse countriesByCode = vkClient.getCountriesByCode(countryCode);
         for (Country country : countriesByCode.getItems()) {
             vkLocationDao.save(new VkLocation(country));
         }
-        int count = 0;
-
+        List<Region> regions = new ArrayList<>();
         for (Country country : countriesByCode.getItems()) {
             final GetRegionsResponse regionsByCountryCode = vkClient.getRegionsByCountryCode(country.getId());
-            //sleep(timeout);
+            regions.addAll(regionsByCountryCode.getItems());
             for (Region region : regionsByCountryCode.getItems()) {
                 vkLocationDao.save(new VkLocation(region, country));
-                count++;
-                task.setComplete(count);
             }
-       /*     //final Integer regionsTotal = regionsByCountryCode.getCount();
-
-            for (Region region : regionsByCountryCode.getItems()) {
-                System.out.println("region = " + region);
-                final List<City> citiesByCountryAndRegion = vkClient.getCitiesByCountryAndRegion(country.getId(), region.getId());
-                sleep(timeout);
-                for (City city : citiesByCountryAndRegion) {
-                    vkLocationDao.save(new VkLocation(city, region));
-                }
-                count++;
-                task.setComplete(count);
-            }*/
-
         }
-        task.stop();
-        return task;
+        return Response.of(regions);
     }
 
 

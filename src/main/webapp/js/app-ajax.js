@@ -30,7 +30,7 @@
                                                // $('#ajaxGetUserServletResponse').text(JSON.stringify(data, null, 4));
                                                 loadTab(respTab, method, url, JSON.stringify(data, null, 4));
                                             } else {
-                                                loadTab(respTab, method, url, Mustache.render( template[0].innerHTML, data ));
+                                                loadTab(respTab, method, url, Mustache.to_html( template[0].innerHTML, data ));
                                                /*let tab = $('#ajaxGetUserServletResponse');
                                                let tabHeaders = tab.find('ul li');
                                                let tabName = method + '_tab_' + tabHeaders.length;
