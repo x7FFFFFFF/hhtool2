@@ -109,6 +109,8 @@
                         <resourceBases>
                             <directory>src/main/webapp</directory>
                             <directory>src/main/webapp/js</directory>
+                            <directory>src/main/webapp/css</directory>
+                            <directory>src/main/webapp/templates</directory>
                         </resourceBases>
                     </webApp>
                     <stopKey/>

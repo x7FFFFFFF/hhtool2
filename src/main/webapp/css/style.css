@@ -1,21 +1,22 @@
-        input {
-            width: 300px;
-        }
+input {
+    width: 300px;
+}
 
-        .template {
-            display: none;
-        }
+table tr {
+    border-bottom: 2px solid black;
+}
 
-        .ui-icon-circle-close {
-            cursor: pointer;
-        }
 
-        #ajaxGetUserServletResponse {
-            margin-top: 1em;
-        }
+.ui-icon-circle-close {
+    cursor: pointer;
+}
 
-        #ajaxGetUserServletResponse li .ui-icon-close {
-            float: left;
-            margin: 0.4em 0.2em 0 0;
-            cursor: pointer;
-        }
+#ajaxGetUserServletResponse {
+    margin-top: 1em;
+}
+
+#ajaxGetUserServletResponse li .ui-icon-close {
+    float: left;
+    margin: 0.4em 0.2em 0 0;
+    cursor: pointer;
+}
