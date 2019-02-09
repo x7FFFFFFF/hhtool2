@@ -5,12 +5,14 @@
     let dataUrl = 'data-url';
     let dataParmsId = 'data-parms-id';
     let dataTeplateId = 'data-teplate-id';
+    let dataTeplateUrl = 'data-teplate-url';
     let dataOutputId = 'data-output-id';
     let document = global.document;
     let apiBase = '';
-    let controlsId ='';
-    let outputId ='';
-    let defaultTemplateId = null;
+    let controlsId = '';
+    let outputId = '';
+    let defaultTemplateId = '';
+    let teplateBaseUrl = '';
 
     let loadParams = function (button, context) {
         let res = {};
@@ -22,12 +24,12 @@
             }
         }
         return res;
-    }
+    };
 
 
     function getUrl(button) {
         let attr = getAttr(button, dataUrl);
-        if (attr === null) {
+        if (!attr) {
             throw "Missed attribute " + dataUrl;
         }
         return apiBase + attr;
@@ -40,30 +42,50 @@
         return null;
     }
 
-    function getTemplateId(el){
-         let  val = getAttr(el, dataTeplateId);
-         if (val === null) {
-            return defaultTemplateId;
-         }
-         return val;
+//$(templateId)[0].innerHTML;
+    function getTemplate(el, consumer) {
+        let id = getAttr(el, dataTeplateId);
+        if (!id) {
+            let url = getAttr(el, dataTeplateUrl);
+            if (url) {
+                $.get(teplateBaseUrl + url, function (data) {
+                    consumer(data);
+                });
+                return;
+            } else {
+                if (defaultTemplateId) {
+                    consumer($(defaultTemplateId)[0].innerHTML);
+                    return;
+                }
+            }
+
+        } else {
+            consumer($(id)[0].innerHTML);
+            return;
+        }
+        return consumer(null);
     }
 
     global.Binding.apiBase = function (str) {
         apiBase = str;
         return global.Binding;
-    }
+    };
     global.Binding.controlsId = function (id) {
-            controlsId = id;
-            return global.Binding;
-    }
+        controlsId = id;
+        return global.Binding;
+    };
     global.Binding.outputId = function (id) {
-            outputId = id;
-            return global.Binding;
-    }
+        outputId = id;
+        return global.Binding;
+    };
     global.Binding.defaultTemplateId = function (id) {
-            defaultTemplateId = id;
-            return global.Binding;
-    }
+        defaultTemplateId = id;
+        return global.Binding;
+    };
+    global.Binding.teplateBaseUrl = function (url) {
+        teplateBaseUrl = url;
+        return global.Binding;
+    };
 
 
     global.Binding.bind = function () {
@@ -84,21 +106,23 @@
                 let tabHeaders = ul.children();
                 let tabName = url.replace(/\//g, '_') + '_tab_' + (tabHeaders.length + 1);
                 ul.append('<li><a href="#' + tabName + '">' + url + '</a><span class="ui-icon ui-icon-close" role="presentation">Remove Tab</span>');//<span class="ui-icon ui-icon-circle-close ui-closable-tab"></span>
-                tab.append('<div id="' + tabName + '">' + data + '</div>')
+                tab.append('<div id="' + tabName + '">' + data + '</div>');
                 tab.tabs("refresh");
-            }
+            };
 
             let onClick = function (e) {
                 let param = loadParams(this, main);
                 let url = getUrl(this);
-                let templateId = getTemplateId(this);
-                let template = $(templateId)[0].innerHTML;
+                let context = this;
                 let onResponce = function (data) {
-                    if (templateId === null) {
-                        loadTab(url, JSON.stringify(data, null, 4));
-                    } else {
-                        loadTab(url, tempateEng.to_html(template, data));
-                    }
+                    let consumerTemplate = function (template) {
+                        if (!template) {
+                            loadTab(url, JSON.stringify(data, null, 4));
+                        } else {
+                            loadTab(url, tempateEng.to_html(template, data));
+                        }
+                    };
+                    getTemplate(context, consumerTemplate);
                 };
                 $.get(url, param, onResponce);
 
@@ -108,69 +132,6 @@
         $(document).ready(init);
     }
 
-}));
-/*
+}))
+;
 
-var api = '/hhtool2/services/';
-var respTab = '#ajaxGetUserServletResponse';
-
-String.prototype.endsWith = function (suffix) {
-    return this.indexOf(suffix, this.length - suffix.length) !== -1;
-};
-debugger;
-
-function loadTab(id, method, url, text) {
-    let tab = $(id);
-    let ul = $('#ajaxGetUserServletResponse>ul');
-    let tabHeaders = ul.children();
-    let tabName = method + '_tab_' + (tabHeaders.length + 1);
-    ul.append('<li><a href="#' + tabName + '">' + url + '</a><span class="ui-icon ui-icon-close" role="presentation">Remove Tab</span>');//<span class="ui-icon ui-icon-circle-close ui-closable-tab"></span>
-    tab.append('<div id="' + tabName + '">' + text + '</div>')
-    tab.tabs("refresh");
-}
-
-function bind(method) {
-    $('#' + method).click(function (event) {
-        let obj = {};
-        let template = $('#' + method + '_template');
-        $('input[id^="' + method + '"][type=text]').each(function (i, el) {
-            obj[el.id.replace(method + '_', '')] = el.value
-        })
-
-        let url = api + method.replace('_', '/');
-        $.get(url, obj, function (data) {
-            if (!template.length) {
-                // $('#ajaxGetUserServletResponse').text(JSON.stringify(data, null, 4));
-                loadTab(respTab, method, url, JSON.stringify(data, null, 4));
-            } else {
-                loadTab(respTab, method, url, Mustache.to_html(template[0].innerHTML, data));
-                *//*let tab = $('#ajaxGetUserServletResponse');
-                let tabHeaders = tab.find('ul li');
-                let tabName = method + '_tab_' + tabHeaders.length;
-                tab.find('ul').append('<li><a href="#' + tabName +'">' + url + '</a></li>');
-                let text =  Mustache.render( template[0].innerHTML, data );
-                tab.append('<div id="' + tabName + '">' + text + '</div>')
-                tab.tabs( "refresh" );*//*
-                //$('#ajaxGetUserServletResponse').html();
-            }
-        });
-    });
-}
-
-
-$(document).ready(function () {
-    $(respTab).tabs().on("click", "span.ui-icon-close", function () {
-        var panelId = $(this).closest("li").remove().attr("aria-controls");
-        $("#" + panelId).remove();
-        tabs.tabs("refresh");
-    });
-
-
-    bind('hh_loadLocations');
-    bind('vk_loadRegions');
-    bind('merge_mergeCountries');
-    bind('merge_mergeRegions');
-    bind('vk_searchLocation');
-
-
-});*/
