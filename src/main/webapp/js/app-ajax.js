@@ -3,6 +3,7 @@
     factory(global, global.$, global.Mustache);
 }(this, function (global, $, tempateEng) {
     let dataUrl = 'data-url';
+    let dataUrlMethod = 'data-url-method';
     let dataParmsId = 'data-parms-id';
     let dataTeplateId = 'data-teplate-id';
     let dataTeplateUrl = 'data-teplate-url';
@@ -12,13 +13,15 @@
     let controlsId = '';
     let outputId = '';
     let defaultTemplateId = '';
+    let defaultMethod = 'GET';
     let teplateBaseUrl = '';
+    let cache = {};
 
     let loadParams = function (button, context) {
         let res = {};
         if (button.hasAttribute(dataParmsId)) {
             let value = button.attributes[dataParmsId].value;
-            let params = $('input[' + value + '][type!=button]', context);
+            let params = $(value + '[type!=button]', context);
             for (let param of params) {
                 res[param.name] = param.value;
             }
@@ -88,6 +91,11 @@
     };
 
 
+    function getMethod(el) {
+        let val = getAttr(el, dataUrlMethod);
+        return (val) ? val : defaultMethod;
+    }
+
     global.Binding.bind = function () {
         let init = function () {
             let main = $(controlsId);
@@ -114,20 +122,45 @@
                 let param = loadParams(this, main);
                 let url = getUrl(this);
                 let context = this;
+                let method = getMethod(this);
+                let outputId = getAttr(this, dataOutputId);
                 let onResponce = function (data) {
                     let consumerTemplate = function (template) {
+                        let text;
                         if (!template) {
-                            loadTab(url, JSON.stringify(data, null, 4));
+                            text = JSON.stringify(data, null, 4);
                         } else {
-                            loadTab(url, tempateEng.to_html(template, data));
+                            text = tempateEng.to_html(template, data);
+                        }
+                        if (outputId) {
+                            $(outputId).innerHTML = text;
+                        } else {
+                            loadTab(url, text);
                         }
                     };
                     getTemplate(context, consumerTemplate);
                 };
-                $.get(url, param, onResponce);
+                $.ajax(
+                    {
+                        method: method,
+                        url: url,
+                        data: param
+                    }).done(onResponce);
 
             };
-            $('input[' + dataUrl + '][type=button]', main).click(onClick);
+            setInterval(function () {
+                let button = $('input[' + dataUrl + '][type=button]', main).each(function (i, el) {
+                        let attr = getAttr(el, 'id');
+                        if (!cache[attr]) {
+                            cache[attr] = true;
+                            $(el).click(onClick);
+                        }
+                    }
+                );
+
+
+            }, 1000);
+
         };
         $(document).ready(init);
     }

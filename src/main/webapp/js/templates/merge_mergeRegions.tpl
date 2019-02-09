@@ -15,11 +15,35 @@
                                        <td>{{hhLocation.resolved}}</td>
                                        <td>{{hhLocation.locationType}}</td>
                                        <td>
-                                              {{#vkLocations}}
-                                                      {{id}}  {{name}} <br />
+                                       {{^vkLocations.length}}
+                                           <p>No Variants</p>
+                                       {{/vkLocations.length}}
+                                       {{#hhLocation.resolved}}
+                                            Resolved
+                                       {{/hhLocation.resolved}}
+                                        {{^hhLocation.resolved}}
+                                           NOT Resolved
+                                        {{/hhLocation.resolved}}
 
-                                              {{/vkLocations}}
+                                       {{#vkLocations}}
+                                                <input id="hh_{{hhLocation.id}}_param_{{id}}" name="id" type="radio" value="{{id}}">{{name}}</input>
+                                       {{/vkLocations}}
 
+                                       <br />
+
+                                       {{#vkLocations.length}}
+                                                <input class="button" type="button" id="merge_mapLocation" value="Map selected vk location to hh"
+                                                                       data-url-method="POST"
+                                                                       data-url="merge/mapLocation/{{hhLocation.id}}/"
+                                                                       data-parms-id="input[id^=hh_{{hhLocation.id}}_param_]:checked"
+                                                                       data-output-id="#hh_{{hhLocation.id}}_out"
+                                                            />
+
+                                                 <div id="hh_{{hhLocation.id}}_out">
+                                                 </div>
+
+
+                                        {{/vkLocations.length}}
                                        </td>
 
                                    </tr>

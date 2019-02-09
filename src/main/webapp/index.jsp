@@ -11,7 +11,7 @@
 
     <script src="https://code.jquery.com/jquery-1.12.4.js" type="text/javascript"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"
+    <script src="${pageContext.request.contextPath}/js/mustache.js"
             type="text/javascript"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/js/app-ajax.js"></script>
 
@@ -24,12 +24,13 @@
 
     </script>
     <script type="text/javascript">
-        Binding.apiBase('${pageContext.request.contextPath}/services/')
-            .teplateBaseUrl('${pageContext.request.contextPath}/js/templates/')
-            .controlsId('#controls')
-            .outputId('#output')
-            .defaultTemplateId('#default_template')
-            .bind();
+         let binding = Binding;
+         binding.apiBase('${pageContext.request.contextPath}/services/');
+         binding.teplateBaseUrl('${pageContext.request.contextPath}/js/templates/');
+         binding.controlsId('body');
+         binding.outputId('#output');
+         binding.defaultTemplateId('#default_template');
+         binding.bind();
     </script>
 </head>
 <body>
@@ -46,7 +47,7 @@
                                                                            id="vk_loadRegions_id" value="RU"/></td>
             <td><input class="button" type="button" id="vk_loadRegions" value="Load VK Regions"
                        data-url="vk/loadRegions"
-                       data-parms-id="id^=vk_loadRegions"
+                       data-parms-id="input[id^=vk_loadRegions]"
                        data-teplate-url="vk_loadRegions.tpl"/></td>
         </tr>
         <tr>
@@ -62,7 +63,7 @@
             </td>
             <td><input class="button" type="button" id="merge_mergeRegions" value="Merge child regions"
                        data-url="merge/mergeRegions"
-                       data-parms-id="id^=merge_mergeRegions"
+                       data-parms-id="input[id^=merge_mergeRegions]"
                        data-teplate-url="merge_mergeRegions.tpl"
             /></td>
         </tr>
@@ -71,7 +72,7 @@
             <td><label for="vk_searchLocation_id">Паттерн:</label><input class="input" name="id" type="text"
                                                                          id="vk_searchLocation_id" value=""/></td>
             <td><input class="button" type="button" id="vk_searchLocation" value="Search VK location"
-                       data-url="vk/searchLocation" data-parms-id="id^=vk_searchLocation"/></td>
+                       data-url="vk/searchLocation" data-parms-id="input[id^=vk_searchLocation]"/></td>
         </tr>
     </table>
 

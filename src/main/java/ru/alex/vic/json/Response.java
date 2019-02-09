@@ -17,8 +17,12 @@ public class Response<T> {
         this.items = items;
     }
 
-    public static <T>  Response<T> of(T[] locations) {
+    public static <T> Response<T> of(T[] locations) {
         return Response.of(Arrays.asList(locations));
+    }
+
+    public static <T> Response<T> empty() {
+        return new Response<>(0, null);
     }
 
     public int getCount() {
@@ -37,7 +41,7 @@ public class Response<T> {
         this.items = items;
     }
 
-    public static <T> Response<T> of(List<T> list){
+    public static <T> Response<T> of(List<T> list) {
         return new Response<>(list.size(), list);
     }
 
