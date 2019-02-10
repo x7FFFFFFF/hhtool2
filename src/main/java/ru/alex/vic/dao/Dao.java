@@ -57,6 +57,11 @@ public interface Dao<I, T> {
         entityManager.persist(enity);
     }
 
+    @Transactional
+    default void update(T entitie){
+        getEntityManager().merge(entitie);
+    }
+
 
     @Transactional
     default void update(List<T> entities, Consumer<T> consumer) {

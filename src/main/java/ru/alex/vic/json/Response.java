@@ -1,12 +1,11 @@
 package ru.alex.vic.json;
 
-import ru.alex.vic.json.hh.HHLocationJson;
-
 import java.util.Arrays;
 import java.util.List;
 
 public class Response<T> {
     private int count;
+    private String message;
     private List<T> items;
 
     public Response() {
@@ -16,6 +15,8 @@ public class Response<T> {
         this.count = count;
         this.items = items;
     }
+
+
 
     public static <T> Response<T> of(T[] locations) {
         return Response.of(Arrays.asList(locations));
@@ -45,4 +46,11 @@ public class Response<T> {
         return new Response<>(list.size(), list);
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

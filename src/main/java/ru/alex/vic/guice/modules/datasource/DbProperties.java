@@ -1,0 +1,8 @@
+package ru.alex.vic.guice.modules.datasource;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Retention(RetentionPolicy.RUNTIME)
+public @interface DbProperties {
+}

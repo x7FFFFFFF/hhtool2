@@ -12,10 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Singleton
@@ -51,12 +48,24 @@ public class MergeService {
 
     //mapLocation
     @POST
-    @Path("mapLocation/{hhLocId}")
-    public Response mapLocation(@PathParam("hhLocId") int hhLocId, @FormParam("id") int vkId){
-        System.out.println("hhLocId = " + hhLocId);
-        return  Response.empty();
-    }
+    @Path("mapLocation/{mergeId}")
+    public String mapLocation(@PathParam("mergeId") Long mergeId, @FormParam("id") Long vkId) {
+        if (vkId != 0) {
+            final MergeVk mergeVk = mergeDao.findById(mergeId);
+            final List<VkLocation> vkLocations = mergeVk.getVkLocations();
+            final VkLocation vkLocation = vkLocations.stream()
+                    .filter(vk -> vk.getId().equals(vkId))
+                    .findAny().orElseThrow(IllegalArgumentException::new);
 
+            vkLocations.clear();
+            vkLocations.add(vkLocation);
+            mergeDao.update(mergeVk);
+            return "OK";
+        }
+
+
+        return "FAIL";
+    }
 
 
     @GET
