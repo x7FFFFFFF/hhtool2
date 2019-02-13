@@ -10,6 +10,9 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
+/*@NamedQueries({
+        @NamedQuery(name = "getHHLocation", query = "SELECT h FROM HHLocation h WHERE h.id LIKE :hh ")
+})*/
 public class MergeVk extends BaseEntity {
 
 
@@ -20,22 +23,26 @@ public class MergeVk extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private LocationType locationType;
 
+    @Column
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name="id",
+                    column=@Column(name="hh_id")),
+            @AttributeOverride(name="name",
+                    column=@Column(name="hh_name"))
+    })
+    private Reference hhLocation;
 
 
-    @OneToOne
-    @JoinColumn(name = "hhLocation_id", referencedColumnName = "id")
-    private HHLocation hhLocation;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name="id",
+                    column=@Column(name="vk_id")),
+            @AttributeOverride(name="name",
+                    column=@Column(name="vk_name"))
+    })
+    private Reference vkLocation;
 
-
-    @OneToMany
-    //@JoinColumn(name = "mergeVk_id", referencedColumnName = "id")
-    @JoinTable(
-            name = "vkLoc_merge",
-            joinColumns = @JoinColumn(
-                    name = "vk_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "merge_id", referencedColumnName = "id"))
-    private List<VkLocation> vkLocations;
 
     @Column
     private boolean resolved;
@@ -44,20 +51,28 @@ public class MergeVk extends BaseEntity {
     @Column
     private int distance;
 
-    public HHLocation getHhLocation() {
+    public LocationType getLocationType() {
+        return locationType;
+    }
+
+    public void setLocationType(LocationType locationType) {
+        this.locationType = locationType;
+    }
+
+    public Reference getHhLocation() {
         return hhLocation;
     }
 
-    public void setHhLocation(HHLocation hhLocation) {
+    public void setHhLocation(Reference hhLocation) {
         this.hhLocation = hhLocation;
     }
 
-    public List<VkLocation> getVkLocations() {
-        return vkLocations;
+    public Reference getVkLocation() {
+        return vkLocation;
     }
 
-    public void setVkLocations(List<VkLocation> vkLocations) {
-        this.vkLocations = vkLocations;
+    public void setVkLocation(Reference vkLocation) {
+        this.vkLocation = vkLocation;
     }
 
     public boolean isResolved() {
@@ -74,13 +89,5 @@ public class MergeVk extends BaseEntity {
 
     public void setDistance(int distance) {
         this.distance = distance;
-    }
-
-    public LocationType getLocationType() {
-        return locationType;
-    }
-
-    public void setLocationType(LocationType locationType) {
-        this.locationType = locationType;
     }
 }

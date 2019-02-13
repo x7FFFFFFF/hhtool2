@@ -56,6 +56,14 @@ public interface Dao<I, T> {
         final EntityManager entityManager = getEntityManager();
         entityManager.persist(enity);
     }
+    @Transactional
+    default void save(List<T> enities) {
+        final EntityManager entityManager = getEntityManager();
+        for (T enity : enities) {
+            entityManager.persist(enity);
+        }
+    }
+
 
     @Transactional
     default void update(T entitie){

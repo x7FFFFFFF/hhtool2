@@ -50,12 +50,12 @@ public class Utils {
         return source;
     }
 
-    public static  String replace(String key, String active) {
+    public static String replace(String key, String active) {
         return key.replace(active + ".", "");
     }
 
 
-    public interface Dao{
+    public interface Dao {
         @SqlUpdate("CREATE TABLE user (id INTEGER PRIMARY KEY, name VARCHAR)")
         void createTable();
 
@@ -88,9 +88,6 @@ public class Utils {
         @RegisterBeanMapper(User.class)
         List<User> getAll();
     }
-
-
-
 
 
     public static void main(String[] args) {

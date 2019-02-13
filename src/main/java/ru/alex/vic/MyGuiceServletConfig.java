@@ -21,7 +21,6 @@ import ru.alex.vic.dao.vk.VkLocationDao;
 import ru.alex.vic.entities.hh.HHLocation;
 import ru.alex.vic.entities.merge.MergeVk;
 import ru.alex.vic.entities.vk.VkLocation;
-import ru.alex.vic.guice.modules.jdbi.JdbiModule;
 
 import java.util.Properties;
 
@@ -39,7 +38,7 @@ public class MyGuiceServletConfig extends GuiceServletContextListener {
             protected void configureServlets() {
                 final Properties properties = Utils.createProperties(APPLICATION_PROPERTIES);
                 Names.bindProperties(binder(), properties);
-                install(new JdbiModule(properties));
+                //install(new JdbiModule(properties));
                 install(new JpaPersistModule(properties.getProperty(APP_PERSISTENCE_UNIT)));
                 filter("/*").through(PersistFilter.class);
 
@@ -58,6 +57,7 @@ public class MyGuiceServletConfig extends GuiceServletContextListener {
                 bind(HHClient.class);
                 bind(VkLocationDao.class);
                 bind(Gson.class);
+                bind(CipherUtil.class);
                 serve("/services/*").with(GuiceContainer.class);
                 serve("/main").with(MainServlet.class);
             }

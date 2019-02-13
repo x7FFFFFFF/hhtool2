@@ -1,5 +1,7 @@
 package ru.alex.vic.client.vk;
 
+import ru.alex.vic.CipherUtil;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Arrays;
@@ -14,17 +16,23 @@ public class VkUrlBuilder {
     private final String apiVersion;
     private final String userId;
     private final String accessToken;
+    private final CipherUtil cipherUtil;
     private String method;
     private final Map<String, String> params = new HashMap<>();
 
 
     //"https://api.vk.com/method/METHOD_NAME?PARAMETERS&access_token=ACCESS_TOKEN&v=V"
     @Inject
-    public VkUrlBuilder(@Named("vk.api.base_url") String apiBaseUrl, @Named("vk.api.version") String apiVersion, @Named("vk.user_id") String userId, @Named("vk.access_token") String accessToken) {
+    public VkUrlBuilder(@Named("vk.api.base_url") String apiBaseUrl,
+                        @Named("vk.api.version") String apiVersion,
+                        @Named("vk.user_id") String userId,
+                        @Named("vk.access_token") String accessToken,
+                        CipherUtil cipherUtil) {
         this.apiBaseUrl = apiBaseUrl;
         this.apiVersion = apiVersion;
         this.userId = userId;
-        this.accessToken = accessToken;
+        this.accessToken = cipherUtil.decrypt(accessToken);
+        this.cipherUtil = cipherUtil;
     }
 
     public VkUrlBuilder getCountries() {

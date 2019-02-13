@@ -5,6 +5,7 @@ import ru.alex.vic.dao.Dao;
 import ru.alex.vic.entities.LocationType;
 import ru.alex.vic.entities.hh.HHLocation;
 import ru.alex.vic.entities.merge.MergeVk;
+import ru.alex.vic.entities.merge.Reference;
 import ru.alex.vic.entities.vk.VkLocation;
 import ru.alex.vic.json.Response;
 
@@ -20,6 +21,7 @@ import java.util.*;
 @Produces(MediaType.APPLICATION_JSON)
 public class MergeService {
 
+    public static final Comparator<MergeVk> MERGE_VK_COMPARATOR = Comparator.comparing(o -> o.getHhLocation().getId());
     private final Dao<Long, VkLocation> vkLocationDao;
     private final Dao<Long, HHLocation> hhLocationDao;
     private final Dao<Long, MergeVk> mergeDao;
@@ -37,12 +39,7 @@ public class MergeService {
     @GET
     @Path("clearMergeTable")
     public String clearMergeTable() {
-        final List<MergeVk> mergeVks = mergeDao.getAll();
-        for (MergeVk mergeVk : mergeVks) {
-            final List<VkLocation> vkLocations = mergeVk.getVkLocations();
-            //vkLocationDao.update(mergeVk.getVkLocations(), loc->loc.s);
-        }
-
+        mergeDao.deleteAll();
         return "OK";
     }
 
@@ -50,7 +47,7 @@ public class MergeService {
     @POST
     @Path("mapLocation/{mergeId}")
     public String mapLocation(@PathParam("mergeId") Long mergeId, @FormParam("id") Long vkId) {
-        if (vkId != 0) {
+       /* if (vkId != 0) {
             final MergeVk mergeVk = mergeDao.findById(mergeId);
             final List<VkLocation> vkLocations = mergeVk.getVkLocations();
             final VkLocation vkLocation = vkLocations.stream()
@@ -62,7 +59,7 @@ public class MergeService {
             mergeDao.update(mergeVk);
             return "OK";
         }
-
+*/
 
         return "FAIL";
     }
@@ -76,14 +73,19 @@ public class MergeService {
         final List<HHLocation> hhRegions = hhLocationDao.findByFields(params);
         List<MergeVk> res = new ArrayList<>();
         for (HHLocation hhRegion : hhRegions) {
-            res.add(mergeCountry(hhRegion));
+            res.addAll(mergeCountry(hhRegion));
         }
 
-        return Response.of(res);
+        return Response.of(sort(res));
 
     }
 
-    private MergeVk mergeCountry(HHLocation hhCountry) {
+    private List<MergeVk> sort(List<MergeVk> res) {
+        Collections.sort(res, MERGE_VK_COMPARATOR);
+        return res;
+    }
+
+    private List<MergeVk> mergeCountry(HHLocation hhCountry) {
         clear(hhCountry);
         Map<String, Object> params = new HashMap<>();
         params.put("locationType", LocationType.COUNTRY);
@@ -92,19 +94,14 @@ public class MergeService {
         return getMergeVk(hhCountry, vkCountries, true);
     }
 
-    private MergeVk getMergeVk(HHLocation hhLocation, List<VkLocation> vkLocations, boolean exact) {
-        final boolean hasOneVariant = vkLocations.size() == 1;
-        MergeVk mergeVk = createMergeVk(hhLocation, vkLocations, hasOneVariant);
+    private List<MergeVk> getMergeVk(HHLocation hhLocation, List<VkLocation> vkLocations, boolean exact) {
+        final List<MergeVk> mergeVk = createMergeVk(hhLocation, vkLocations, exact);
         mergeDao.save(mergeVk);
-        if (hasOneVariant && exact) {
-            hhLocation.setResolved(true);
-            hhLocationDao.save(hhLocation);
-        }
         return mergeVk;
     }
 
     private void clear(HHLocation location) {
-        final List<MergeVk> locations = mergeDao.findByField("hhLocation", location);
+        final List<MergeVk> locations = mergeDao.findByField("hhLocation", Reference.from(location));
         mergeDao.delete(locations);
     }
 
@@ -118,7 +115,7 @@ public class MergeService {
         final List<HHLocation> hhRegions = hhLocationDao.findByFields(params);
         List<MergeVk> res = new ArrayList<>();
         for (HHLocation hhRegion : hhRegions) {
-            res.add(merge(hhRegion));
+            res.addAll(merge(hhRegion));
         }
 
 
@@ -130,10 +127,10 @@ public class MergeService {
                 mergeCity(city, vkLocationList.get(0));
             }
         }*/
-        return Response.of(res);
+        return Response.of(sort(res));
     }
 
-    private MergeVk merge(HHLocation hhRegion) {
+    private List<MergeVk> merge(HHLocation hhRegion) {
         clear(hhRegion);
         String region = replaceRepublic(hhRegion.getName());
         boolean exact = true;
@@ -150,15 +147,34 @@ public class MergeService {
         return (name.startsWith(prefix)) ? name.substring(prefix.length()).trim() : name.trim();
     }
 
-    private MergeVk createMergeVk(HHLocation hhLocation, List<VkLocation> vkLocationList, boolean hasOneVariant) {
-        MergeVk mergeVk = new MergeVk();
-        mergeVk.setHhLocation(hhLocation);
-        mergeVk.setLocationType(hhLocation.getLocationType());
-        mergeVk.setVkLocations(vkLocationList);
-        if (hasOneVariant) {
-            mergeVk.setResolved(true);
+    private List<MergeVk> createMergeVk(HHLocation hhLocation, List<VkLocation> vkLocationList, boolean exact) {
+        List<MergeVk> res = new ArrayList<>();
+        if (vkLocationList.size() == 0) {
+            res.add(createMerge(hhLocation, null));
+            return res;
         }
-        mergeVk.setDistance(100);
+        if (vkLocationList.size() == 1) {
+            final MergeVk merge = createMerge(hhLocation, vkLocationList.get(0));
+            if (exact) {
+                merge.setResolved(true);
+                merge.setDistance(100);
+            }
+            res.add(merge);
+            return res;
+        }
+        for (VkLocation vkLocation : vkLocationList) {
+            res.add(createMerge(hhLocation, vkLocation));
+        }
+        return res;
+    }
+
+
+
+    private MergeVk createMerge(HHLocation hhLocation, VkLocation vkLocation) {
+        MergeVk mergeVk = new MergeVk();
+        mergeVk.setLocationType(hhLocation.getLocationType());
+        mergeVk.setHhLocation(Reference.from(hhLocation));
+        mergeVk.setVkLocation(Reference.from(vkLocation));
         return mergeVk;
     }
 
