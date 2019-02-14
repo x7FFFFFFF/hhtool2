@@ -23,25 +23,17 @@ public class MergeVk extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private LocationType locationType;
 
-    @Column
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name="id",
-                    column=@Column(name="hh_id")),
-            @AttributeOverride(name="name",
-                    column=@Column(name="hh_name"))
-    })
-    private Reference hhLocation;
 
 
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name="id",
-                    column=@Column(name="vk_id")),
-            @AttributeOverride(name="name",
-                    column=@Column(name="vk_name"))
-    })
-    private Reference vkLocation;
+    @OneToOne
+    @JoinColumn(name = "hh_id")
+    private HHLocation hhLocation;
+
+
+
+    @ManyToOne
+    @JoinColumn(name = "vk_id")
+    private VkLocation vkLocation;
 
 
     @Column
@@ -59,19 +51,19 @@ public class MergeVk extends BaseEntity {
         this.locationType = locationType;
     }
 
-    public Reference getHhLocation() {
+    public HHLocation getHhLocation() {
         return hhLocation;
     }
 
-    public void setHhLocation(Reference hhLocation) {
+    public void setHhLocation(HHLocation hhLocation) {
         this.hhLocation = hhLocation;
     }
 
-    public Reference getVkLocation() {
+    public VkLocation getVkLocation() {
         return vkLocation;
     }
 
-    public void setVkLocation(Reference vkLocation) {
+    public void setVkLocation(VkLocation vkLocation) {
         this.vkLocation = vkLocation;
     }
 

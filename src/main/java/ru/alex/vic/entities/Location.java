@@ -7,7 +7,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
-public class Location extends BaseEntity {
+public abstract class Location extends BaseEntity {
 
 
     @Column(name = "name", nullable = false)

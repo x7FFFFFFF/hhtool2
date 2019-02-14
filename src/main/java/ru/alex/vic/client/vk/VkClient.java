@@ -68,13 +68,17 @@ public class VkClient {
         return httpClient.get(url, (gson, json) -> {
             if (json.has("error")) {
                 JsonElement errorElement = json.get("error");
-                Error error;
                 try {
-                    error = gson.fromJson(errorElement, Error.class);
+                    if (errorElement.isJsonObject()) {
+                        final JsonObject errorJson = errorElement.getAsJsonObject();
+                        if (errorJson.has("error_msg")) {
+                            throw new RuntimeException(errorJson.get("error_msg").getAsString() + " ; url=" + url);
+                        }
+                    }
                 } catch (JsonSyntaxException e) {
                     throw new RuntimeException(e);
                 }
-                throw error;
+                throw new RuntimeException("url=" + url);
             }
 
             JsonElement response = json;

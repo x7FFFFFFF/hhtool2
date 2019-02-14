@@ -7,6 +7,8 @@
                                 <td>vk.name/td>
                                 <td>hh.locationType</td>
                                 <td>resolved</td>
+                                <td>Action</td>
+                                <td>Result</td>
                            </tr>
 
                               {{#items}}
@@ -26,22 +28,21 @@
                                                         {{/resolved}}
 
                                            </td>
+                                           <td>
+                                                          {{^resolved}}
+                                                                <input class="button" type="button"
+                                                                 id="merge_mapLocation_{{id}}"
+                                                                 value="map"
+                                                                 data-url-method="POST"
+                                                                 data-url="merge/mapLocation/{{id}}"
+                                                                 data-output-id="#merge_out_{{id}}"/>
+                                                          {{/resolved}}
+
+                                           </td>
+                                            <td id="merge_out_{{id}}">
 
 
-
-
-
-
-                                        <!--input class="button" type="button" id="merge_mapLocation" value="Map selected vk location to hh"
-                                                               data-url-method="POST"
-                                                               data-url="merge/mapLocation/{{id}}/"
-                                                               data-parms-id="input[id^=hh_{{hhLocation.id}}_param_]:checked"
-                                                               data-output-id="#hh_{{hhLocation.id}}_out"
-
-                                                   <div id="hh_{{hhLocation.id}}_out">
-                                                                                            </div>
-                                                    /-->
-
+                                           </td>
 
                                    </tr>
                               {{/items}}

@@ -18,7 +18,10 @@ import java.util.Scanner;
 public class CipherUtil {
 
     public static final String UTF_8 = "UTF-8";
+    public static final String ENCRYPT = "--encrypt";
+    public static final String DECRYPT = "--decrypt";
     private final char[] key;
+
     @Inject
     public CipherUtil(@Named("key.file") String fileName) {
         try (final Scanner scanner = new Scanner(getClass().getClassLoader().getResourceAsStream(fileName), UTF_8)) {
@@ -76,26 +79,57 @@ public class CipherUtil {
 
 
     public static void main(String[] args) {
+        String method, file, value;
         if (args.length != 3) {
             System.out.println("Usage:");
             System.out.println("СipherUtil [--decrypt|--encrypt]  <key file> <value>");
-            return;
+            try (Scanner reader = new Scanner(System.in)) {
+                System.out.println("Enter method. 'd' - decrypt, 'e' -encrypt:");
+                method = getMethod(reader.nextLine());
+                System.out.println("method = " + method);
+                System.out.println("Enter key file. Default - 'key.sec':");
+                file = getFile(reader.nextLine(), "key.sec");
+                System.out.println("file = " + file);
+                System.out.println("Enter token value:");
+                value = reader.nextLine();
+                System.out.println("value = " + value);
+            }
+        } else {
+            method = args[0];
+            file = args[1];
+            value = args[2];
         }
-        final String file = args[1];
-        final String value = args[2];
+        System.out.println("Result:");
+        System.out.println(getResult(method, file, value));
+
+
+    }
+
+    private static String getResult(String method, String file, String value) {
         CipherUtil util = new CipherUtil(file);
-        switch (args[0]) {
-            case "--encrypt":
-                System.out.println(util.encrypt(value));
-                break;
-            case "--decrypt":
-                System.out.println(util.decrypt(value));
-                break;
+        switch (method) {
+            case ENCRYPT:
+                return util.encrypt(value);
+            case DECRYPT:
+                return util.decrypt(value);
             default:
-                throw new IllegalArgumentException(args[0]);
+                throw new IllegalArgumentException(method);
         }
+    }
 
+    private static String getFile(String name, String def) {
+        return (name == null || name.isEmpty()) ? def : name;
+    }
 
+    private static String getMethod(String name) {
+        switch (name) {
+            case "d":
+                return DECRYPT;
+            case "e":
+                return ENCRYPT;
+            default:
+                throw new IllegalArgumentException(name);
+        }
     }
 
 

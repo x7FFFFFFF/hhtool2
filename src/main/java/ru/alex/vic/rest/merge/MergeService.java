@@ -1,6 +1,7 @@
 package ru.alex.vic.rest.merge;
 
 
+import com.google.inject.persist.Transactional;
 import ru.alex.vic.dao.Dao;
 import ru.alex.vic.entities.LocationType;
 import ru.alex.vic.entities.hh.HHLocation;
@@ -21,7 +22,7 @@ import java.util.*;
 @Produces(MediaType.APPLICATION_JSON)
 public class MergeService {
 
-    public static final Comparator<MergeVk> MERGE_VK_COMPARATOR = Comparator.comparing(o -> o.getHhLocation().getId());
+    private static final Comparator<MergeVk> MERGE_VK_COMPARATOR = Comparator.comparing(o -> o.getHhLocation().getId());
     private final Dao<Long, VkLocation> vkLocationDao;
     private final Dao<Long, HHLocation> hhLocationDao;
     private final Dao<Long, MergeVk> mergeDao;
@@ -46,22 +47,20 @@ public class MergeService {
     //mapLocation
     @POST
     @Path("mapLocation/{mergeId}")
-    public String mapLocation(@PathParam("mergeId") Long mergeId, @FormParam("id") Long vkId) {
-       /* if (vkId != 0) {
-            final MergeVk mergeVk = mergeDao.findById(mergeId);
-            final List<VkLocation> vkLocations = mergeVk.getVkLocations();
-            final VkLocation vkLocation = vkLocations.stream()
-                    .filter(vk -> vk.getId().equals(vkId))
-                    .findAny().orElseThrow(IllegalArgumentException::new);
-
-            vkLocations.clear();
-            vkLocations.add(vkLocation);
-            mergeDao.update(mergeVk);
-            return "OK";
+    @Transactional
+    public Response<String> mapLocation(@PathParam("mergeId") Long mergeId) {
+        final MergeVk merge = mergeDao.findById(mergeId);
+        final HHLocation hhLocation = merge.getHhLocation();
+        final List<MergeVk> mergeVkList = mergeDao.findByField("hhLocation", hhLocation);
+        for (MergeVk mergeVk : mergeVkList) {
+            if (!mergeVk.getId().equals(merge.getId())){
+                mergeDao.delete(mergeVk);
+            }
         }
-*/
+        merge.setResolved(true);
+        mergeDao.save(merge);
 
-        return "FAIL";
+        return Response.of("OK");
     }
 
 
@@ -101,7 +100,7 @@ public class MergeService {
     }
 
     private void clear(HHLocation location) {
-        final List<MergeVk> locations = mergeDao.findByField("hhLocation", Reference.from(location));
+        final List<MergeVk> locations = mergeDao.findByField("hhLocation", location);
         mergeDao.delete(locations);
     }
 
@@ -144,7 +143,9 @@ public class MergeService {
 
     String replaceRepublic(String name) {
         final String prefix = "Республика";
-        return (name.startsWith(prefix)) ? name.substring(prefix.length()).trim() : name.trim();
+        return name.replace("Республика", "")
+                .replace("республика", "")
+                .trim();
     }
 
     private List<MergeVk> createMergeVk(HHLocation hhLocation, List<VkLocation> vkLocationList, boolean exact) {
@@ -169,12 +170,11 @@ public class MergeService {
     }
 
 
-
     private MergeVk createMerge(HHLocation hhLocation, VkLocation vkLocation) {
         MergeVk mergeVk = new MergeVk();
         mergeVk.setLocationType(hhLocation.getLocationType());
-        mergeVk.setHhLocation(Reference.from(hhLocation));
-        mergeVk.setVkLocation(Reference.from(vkLocation));
+        mergeVk.setHhLocation(hhLocation);
+        mergeVk.setVkLocation(vkLocation);
         return mergeVk;
     }
 

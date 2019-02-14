@@ -16,10 +16,15 @@
     <script type="text/javascript" src="${pageContext.request.contextPath}/js/app-ajax.js"></script>
 
     <script id="default_template" type="text/mustache">
-                           count = {{count}} <br />
+                            {{#message}}
+                                message = {{.}}<br />
+                            {{/message}}
+                            {{#count}}
+                                count = {{.}} <br />
+                            {{/count}}
                             {{#items}}
                                         {{id}} &nbsp;{{name}}  &nbsp;{{title}}<br />
-                             {{/items}}
+                            {{/items}}
 
 
     </script>

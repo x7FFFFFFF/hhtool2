@@ -133,7 +133,7 @@
                             text = tempateEng.to_html(template, data);
                         }
                         if (outputId) {
-                            $(outputId).innerHTML = text;
+                            $(outputId)[0].innerHTML = text;
                         } else {
                             loadTab(url, text);
                         }
