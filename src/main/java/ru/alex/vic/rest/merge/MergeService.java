@@ -53,11 +53,13 @@ public class MergeService {
         final HHLocation hhLocation = merge.getHhLocation();
         final List<MergeVk> mergeVkList = mergeDao.findByField("hhLocation", hhLocation);
         for (MergeVk mergeVk : mergeVkList) {
-            if (!mergeVk.getId().equals(merge.getId())){
+            if (!mergeVk.getId().equals(merge.getId())) {
                 mergeDao.delete(mergeVk);
             }
         }
-        merge.setResolved(true);
+        if (mergeVkList.size() == 1) {
+            merge.setResolved(true);
+        }
         mergeDao.save(merge);
 
         return Response.of("OK");
@@ -111,23 +113,39 @@ public class MergeService {
         Map<String, Object> params = new HashMap<>();
         params.put("locationType", LocationType.REGION);
         params.put("parentVendorId", hhCountryCode);
+        return getMergeVkResponse(params);
+    }
+
+    public Response<MergeVk> getMergeVkResponse(Map<String, Object> params) {
         final List<HHLocation> hhRegions = hhLocationDao.findByFields(params);
         List<MergeVk> res = new ArrayList<>();
         for (HHLocation hhRegion : hhRegions) {
             res.addAll(merge(hhRegion));
         }
-
-
-
-      /*  vkLocationDao.update(vkLocationList, loc -> loc.setResolved(true));
-        if (hasOneVariant && hhRegion.getHasChilds()) {
-            final List<HHLocation> cities = hhLocationDao.findByField("parentVendorId", hhRegion.getVendorId());
-            for (HHLocation city : cities) {
-                mergeCity(city, vkLocationList.get(0));
-            }
-        }*/
         return Response.of(sort(res));
     }
+
+    @POST
+    @Path("mergeChildLocations/{locationType}/{hhLocationId}")
+    public Response<MergeVk> mergeChildLocations(@PathParam("locationType") LocationType locationType,
+                                                 @PathParam("hhLocationId") Integer hhLocationId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("locationType", getChild(locationType));
+        params.put("parentVendorId", hhLocationId);
+        return getMergeVkResponse(params);
+    }
+
+    private LocationType getChild(LocationType locationType) {
+        switch (locationType) {
+            case COUNTRY:
+                return LocationType.REGION;
+            case REGION:
+                return LocationType.CITY;
+            default:
+                throw new IllegalArgumentException(locationType.toString());
+        }
+    }
+
 
     private List<MergeVk> merge(HHLocation hhRegion) {
         clear(hhRegion);

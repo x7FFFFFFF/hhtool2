@@ -4,7 +4,7 @@
                                 <td>hh.id</td>
                                 <td>hh.name</td>
                                 <td>vk.id</td>
-                                <td>vk.name/td>
+                                <td>vk.name</td>
                                 <td>hh.locationType</td>
                                 <td>resolved</td>
                                 <td>Action</td>
@@ -13,9 +13,9 @@
 
                               {{#items}}
                                    <tr>
-                                           <td>{{hhLocation.id}}</td>
+                                           <td>{{hhLocation.vendorId}}</td>
                                            <td>{{hhLocation.name}}</td>
-                                           <td>{{vkLocation.id}}</td>
+                                           <td>{{vkLocation.vendorId}}</td>
                                            <td>{{vkLocation.name}}</td>
 
                                            <td>{{locationType}}</td>
@@ -37,7 +37,15 @@
                                                                  data-url="merge/mapLocation/{{id}}"
                                                                  data-output-id="#merge_out_{{id}}"/>
                                                           {{/resolved}}
-
+                                                          {{#resolved}}
+                                                                 <input class="button" type="button"
+                                                                 id="merge_childLocations_{{id}}"
+                                                                 value="merge child"
+                                                                 data-url-method="POST"
+                                                                 data-teplate-url="merge_mergeRegions.tpl"
+                                                                 data-url="merge/mergeChildLocations/{{locationType}}/{{hhLocation.vendorId}}"
+                                                                 />
+                                                          {{/resolved}}
                                            </td>
                                             <td id="merge_out_{{id}}">
 
