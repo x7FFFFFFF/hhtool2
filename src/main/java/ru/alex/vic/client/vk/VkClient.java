@@ -39,12 +39,13 @@ public class VkClient {
         return executeGet(url, GetRegionsResponse.class);
     }
 
-    public List<City> getCitiesByCountryAndRegion(Integer countryId, Integer regionId) {
+    public List<City> getCitiesByCountryAndRegion(Long countryId, Long regionId) {
         int offset = 0;
         final int count = 100;
         final VkUrlBuilder urlBuilder = this.urlBuilder.get().getCities()
                 .countryId(countryId)
                 .regionId(regionId)
+                .needAll()
                 .offset(offset)
                 .count(count);
         GetCitiesResponse response = executeGet(urlBuilder

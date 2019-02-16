@@ -66,6 +66,12 @@ public class VkUrlBuilder {
         return this;
     }
 
+    VkUrlBuilder param(String key, Long value) {
+        params.put(key, value.toString());
+        return this;
+    }
+
+
     public VkUrlBuilder offset(int offset) {
         return param("offset", String.valueOf(offset));
     }
@@ -93,9 +99,13 @@ public class VkUrlBuilder {
         return param("code", Stream.of(codes).collect(Collectors.joining(",")));
     }
 
+    public VkUrlBuilder countryId(Long code) {
+        return param("country_id", code);
+    }
     public VkUrlBuilder countryId(Integer code) {
         return param("country_id", code);
     }
+
 
     private String buildParams() {
         StringBuilder builder = new StringBuilder();
@@ -113,6 +123,10 @@ public class VkUrlBuilder {
     }
 
     public VkUrlBuilder regionId(Integer regionId) {
+        return param("region_id", regionId);
+    }
+
+    public VkUrlBuilder regionId(Long regionId) {
         return param("region_id", regionId);
     }
 }

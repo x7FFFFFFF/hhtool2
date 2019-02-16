@@ -9,7 +9,10 @@ import javax.persistence.criteria.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @SuppressWarnings("unchecked")
@@ -52,10 +55,12 @@ public interface Dao<I, T> {
 
 
     @Transactional
-    default void save(T enity) {
+    default T save(T enity) {
         final EntityManager entityManager = getEntityManager();
         entityManager.persist(enity);
+        return enity;
     }
+
     @Transactional
     default void save(List<T> enities) {
         final EntityManager entityManager = getEntityManager();
@@ -64,9 +69,21 @@ public interface Dao<I, T> {
         }
     }
 
+    @Transactional
+    default <V> List<T> save(List<V> list, Function<V, T> func) {
+        return list.stream().map(func).map(this::save).collect(Collectors.toList());
+    }
+
 
     @Transactional
-    default void update(T entitie){
+    default <V, P> List<T> save(List<V> list, P parent, BiFunction<P, V, T> func) {
+        final EntityManager entityManager = getEntityManager();
+        return list.stream().map(v -> func.apply(parent, v)).map(this::save).collect(Collectors.toList());
+    }
+
+
+    @Transactional
+    default void update(T entitie) {
         getEntityManager().merge(entitie);
     }
 

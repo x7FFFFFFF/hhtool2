@@ -7,10 +7,9 @@ import ru.alex.vic.json.vk.Country;
 import ru.alex.vic.json.vk.Region;
 
 import javax.persistence.*;
-import java.util.Collection;
 
 @Entity
-@Table(name = "vklocation",indexes = {
+@Table(name = "vklocation", indexes = {
         @Index(name = "index_vklocation_name", columnList = "name"),
         @Index(name = "index_vklocation_parentvendorid", columnList = "parentvendorid"),
         @Index(name = "index_vklocation_vendorid", columnList = "vendorid"),
@@ -21,36 +20,57 @@ public class VkLocation extends Location {
     public VkLocation() {
     }
 
-   /* @ManyToOne
-    @JoinTable(
-            name = "roles_privileges",
-            joinColumns = @JoinColumn(
-                    name = "role_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "privilege_id", referencedColumnName = "id"))
-    private Collection<Privilege> privileges;*/
+    @Column
+    private String area;
 
-    public VkLocation(Country json) {
-        this.setVendorId(json.getId().longValue());
-        this.setName(parenthesesRemove(json.getTitle()));
-        this.setHasChilds(true);
-        this.setLocationType(LocationType.COUNTRY);
+    @Column
+    private String region;
+
+
+    public static VkLocation from(Country json) {
+        VkLocation vkLocation = new VkLocation();
+        vkLocation.setVendorId(json.getId().longValue());
+        vkLocation.setName(parenthesesRemove(json.getTitle()));
+        vkLocation.setHasChilds(true);
+        vkLocation.setLocationType(LocationType.COUNTRY);
+        return vkLocation;
     }
 
-    public VkLocation(Region json, Country country) {
-        this.setVendorId(json.getId().longValue());
-        this.setName(parenthesesRemove(json.getTitle()));
-        this.setHasChilds(true);
-        this.setLocationType(LocationType.REGION);
-        this.setParentVendorId(country.getId().longValue());
+    public static VkLocation from(Country parent, Region json) {
+        VkLocation vkLocation = new VkLocation();
+        vkLocation.setVendorId(json.getId().longValue());
+        vkLocation.setName(parenthesesRemove(json.getTitle()));
+        vkLocation.setHasChilds(true);
+        vkLocation.setLocationType(LocationType.REGION);
+        vkLocation.setParentVendorId(parent.getId().longValue());
+        return vkLocation;
     }
 
-    public VkLocation(City json, Region region) {
-        this.setVendorId(json.getId().longValue());
-        this.setName(parenthesesRemove(json.getTitle()));
-        this.setHasChilds(false);
-        this.setLocationType(LocationType.CITY);
-        this.setParentVendorId(region.getId().longValue());
+    public static VkLocation from(VkLocation parent, City json) {
+        VkLocation vkLocation = new VkLocation();
+        vkLocation.setVendorId(json.getId().longValue());
+        vkLocation.setName(parenthesesRemove(json.getTitle()));
+        vkLocation.setHasChilds(false);
+        vkLocation.setLocationType(LocationType.CITY);
+        vkLocation.setParentVendorId(parent.getVendorId());
+        vkLocation.setRegion(json.getRegion());
+        vkLocation.setArea(json.getArea());
+        return vkLocation;
     }
 
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
 }
